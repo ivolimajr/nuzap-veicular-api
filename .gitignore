@@ -128,3 +128,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 /package-lock.json
+/.idea/workspace.xml
+/.idea/codeStyles/codeStyleConfig.xml
+/.idea/prettier.xml
+/.idea/codeStyles/Project.xml
+/.idea/vcs.xml

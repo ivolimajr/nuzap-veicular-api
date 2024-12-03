@@ -1,9 +1,11 @@
 {
   "name": "parcela.api",
-  "main": "app/app.js",
+  "main": "src/app.js",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon app/app.js"
+    "dev": "nodemon index.js",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
@@ -13,5 +15,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "nodemon": "^3.1.7"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.1"
   }
 }
