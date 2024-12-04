@@ -42,6 +42,10 @@ build/Release
 node_modules/
 jspm_packages/
 
+.idea/*.xml
+*.iml
+*.ipr
+*.iws
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
