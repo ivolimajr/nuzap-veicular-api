@@ -133,3 +133,5 @@ dist
 /.idea/prettier.xml
 /.idea/codeStyles/Project.xml
 /.idea/vcs.xml
+/.idea/modules.xml
+/.idea/parcela-api.iml

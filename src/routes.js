@@ -1,17 +1,13 @@
 import { Router } from "express";
+import EpsController from "./app/controllers/EpsController.js";
+import TestController from "./app/controllers/TestController.js";
 
 const routes = new Router();
 
-routes.get("/", (req, res) => {
-  res.status(200).send({ mensagem: "Tarefa executada com sucesso!" });
-});
+routes.get("/",TestController.test);
 
-routes.post("/executar-tarefa", (req, res) => {
-  console.log("Tarefa executada!");
-  res
-    .status(200)
-    .send({ mensagem: "Tarefa executada com sucesso!", data: req.body });
-});
+routes.get("/vehicle/check-order/:epsOrderCode",EpsController.checkOrder);
+routes.get("/vehicle/check-orders",EpsController.checkOrders);
 
-// Remova o parêntese e exporte diretamente a instância `routes`.
 export default routes;
+
