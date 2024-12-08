@@ -11,14 +11,14 @@ class Debito extends Model {
         },
         status: DataTypes.STRING(25),
         descricao: DataTypes.STRING(150),
-        valor: DataTypes.DECIMAL(5,2),
+        valor: DataTypes.DECIMAL(5, 2),
         vencimento: DataTypes.STRING(50),
         created_at: {
           type: DataTypes.DATE,
           allowNull: false,
           defaultValue: Sequelize.fn("NOW"),
         },
-        pedidoId:  {
+        pedidoId: {
           type: DataTypes.BIGINT,
           allowNull: false,
           references: {
@@ -33,7 +33,7 @@ class Debito extends Model {
         sequelize,
         tableName: "parcelatudo_debito",
         timestamps: false,
-      }
+      },
     );
     return this;
   }

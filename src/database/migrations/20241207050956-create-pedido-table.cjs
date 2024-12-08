@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 const { DataTypes } = require("sequelize");
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('parcelatudo_pedido', {
+    await queryInterface.createTable("parcelatudo_pedido", {
       id: {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -11,27 +11,27 @@ module.exports = {
       },
       numeroPedido: DataTypes.BIGINT,
       status: DataTypes.STRING(50),
-      valorLiquido: DataTypes.DECIMAL(5,2),
-      valorPago: DataTypes.DECIMAL(5,2),
+      valorLiquido: DataTypes.DECIMAL(5, 2),
+      valorPago: DataTypes.DECIMAL(5, 2),
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
+        defaultValue: Sequelize.fn("NOW"),
       },
       carroId: {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: 'parcelatudo_carro',
-          key: 'id',
+          model: "parcelatudo_carro",
+          key: "id",
         },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
-      }
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('parcelatudo_pedido');
+    await queryInterface.dropTable("parcelatudo_pedido");
   },
 };

@@ -21,18 +21,18 @@ class Carro extends Model {
         userId: {
           type: DataTypes.BIGINT,
           references: {
-            model: 'parcelatudo_users',
-            key: 'userId',
+            model: "parcelatudo_users",
+            key: "userId",
           },
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE',
-        }
+          onUpdate: "CASCADE",
+          onDelete: "CASCADE",
+        },
       },
       {
         sequelize,
         tableName: "parcelatudo_carro",
         timestamps: false,
-      }
+      },
     );
     return this;
   }

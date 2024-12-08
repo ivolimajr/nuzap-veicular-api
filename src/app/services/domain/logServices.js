@@ -1,7 +1,6 @@
 import Log from "../../models/Log.js";
 import { Op } from "sequelize";
 
-
 class LogServices {
   async registerLog({ pedidoId, statusAtual, descricao, statusFinal }) {
     return await Log.create({
@@ -21,7 +20,9 @@ class LogServices {
 
       // Filtros de data
       const today = new Date().toISOString().split("T")[0]; // Data atual em formato YYYY-MM-DD
-      const start = req.query.start ? new Date(req.query.start) : new Date(today);
+      const start = req.query.start
+        ? new Date(req.query.start)
+        : new Date(today);
       const end = req.query.end ? new Date(req.query.end) : new Date();
 
       // Adicionar o final do dia ao filtro de `end`

@@ -4,6 +4,10 @@ class TestController {
   async test(req, res) {
     return res.status(200).json({ message: "Olá!" });
   }
+
+  testSentry(req, res) {
+    throw new Error("Testing Sentry error!");
+  }
   async testDbConnection(req, res) {
     try {
       const logs = await Log.findAll({

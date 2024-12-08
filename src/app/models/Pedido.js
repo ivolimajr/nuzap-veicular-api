@@ -11,8 +11,8 @@ class Pedido extends Model {
         },
         numeroPedido: DataTypes.BIGINT,
         status: DataTypes.STRING(60),
-        valorLiquido: DataTypes.DECIMAL(5,2),
-        valorPago: DataTypes.DECIMAL(5,2),
+        valorLiquido: DataTypes.DECIMAL(5, 2),
+        valorPago: DataTypes.DECIMAL(5, 2),
         created_at: {
           type: DataTypes.DATE,
           allowNull: false,
@@ -22,18 +22,18 @@ class Pedido extends Model {
           type: DataTypes.INTEGER,
           allowNull: false,
           references: {
-            model: 'cars',
-            key: 'id',
+            model: "cars",
+            key: "id",
           },
-          onUpdate: 'CASCADE',
-          onDelete: 'CASCADE',
+          onUpdate: "CASCADE",
+          onDelete: "CASCADE",
         },
       },
       {
         sequelize,
         tableName: "parcelatudo_pedido",
         timestamps: false,
-      }
+      },
     );
     return this;
   }

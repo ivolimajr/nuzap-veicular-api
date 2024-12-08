@@ -23,7 +23,7 @@ class Log extends Model {
         sequelize,
         tableName: "parcelatudo_log",
         timestamps: false,
-      }
+      },
     );
     return this;
   }

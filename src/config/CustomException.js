@@ -1,5 +1,5 @@
 class CustomException extends Error {
-  constructor(status, message,data) {
+  constructor(status, message, data) {
     super(message);
     this.name = this.constructor.name;
     this.status = status || 500;

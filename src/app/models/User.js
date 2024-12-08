@@ -29,7 +29,7 @@ class User extends Model {
         sequelize,
         tableName: "parcelatudo_users",
         timestamps: false,
-      }
+      },
     );
     return this;
   }

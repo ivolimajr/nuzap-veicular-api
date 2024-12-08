@@ -11,7 +11,7 @@ module.exports = {
       },
       status: DataTypes.STRING(25),
       descricao: DataTypes.STRING(150),
-      valor: DataTypes.DECIMAL(5,2),
+      valor: DataTypes.DECIMAL(5, 2),
       vencimento: DataTypes.STRING(50),
       created_at: {
         type: DataTypes.DATE,

@@ -6,13 +6,7 @@ import Pedido from "../../app/models/Pedido.js";
 import Debito from "../../app/models/Debito.js";
 import Log from "../../app/models/Log.js";
 
-const models=[
-  User,
-  Carro,
-  Pedido,
-  Debito,
-  Log,
-]
+const models = [User, Carro, Pedido, Debito, Log];
 
 async function initModels(connection) {
   for (const model of models) {

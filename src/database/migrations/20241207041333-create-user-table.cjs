@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 const { DataTypes } = require("sequelize");
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('parcelatudo_user', {
+    await queryInterface.createTable("parcelatudo_user", {
       userId: {
         type: DataTypes.BIGINT,
         primaryKey: true,
@@ -22,12 +22,12 @@ module.exports = {
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
+        defaultValue: Sequelize.fn("NOW"),
       },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('parcelatudo_user');
+    await queryInterface.dropTable("parcelatudo_user");
   },
 };
