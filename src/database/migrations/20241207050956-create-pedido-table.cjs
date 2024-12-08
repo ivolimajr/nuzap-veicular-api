@@ -10,7 +10,7 @@ module.exports = {
         autoIncrement: true,
       },
       numeroPedido: DataTypes.BIGINT,
-      status: DataTypes.STRING(25),
+      status: DataTypes.STRING(50),
       valorLiquido: DataTypes.DECIMAL(5,2),
       valorPago: DataTypes.DECIMAL(5,2),
       created_at: {
