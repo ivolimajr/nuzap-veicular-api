@@ -17,7 +17,7 @@ class EpsController {
       const id = Number(req.params.id);
       return res.status(200).json(await EpsServices.checkOrderById(id));
     } catch (e) {
-      return res.status(e.status).json({
+      return res.status(e.status || 500).json({
         error: e.message,
         data: e.data,
       });
@@ -31,7 +31,7 @@ class EpsController {
         .status(200)
         .json(await EpsServices.checkOrderByOrderNumber(numeroPedido));
     } catch (e) {
-      return res.status(e.status).json({
+      return res.status(e.status || 500).json({
         error: e.message,
         data: e.data,
       });

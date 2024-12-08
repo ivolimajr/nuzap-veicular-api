@@ -16,7 +16,7 @@ RUN npm install
 COPY --chown=node:node . .
 
 # Expor a porta configurada
-EXPOSE 3333
+EXPOSE 8080
 
 # Iniciar a aplicação com o arquivo index.js
 CMD ["node", "index.js"]
