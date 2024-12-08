@@ -39,7 +39,7 @@ class Pedido extends Model {
   }
   static associate(models) {
     this.belongsTo(models.Carro, { foreignKey: "carroId", as: "Carro" });
-    this.hasMany(models.Debito, { foreignKey: "pedidoId", as: "Debito" });
+    this.hasMany(models.Debito, { foreignKey: "debitoId", as: "Debito" });
   }
 }
 

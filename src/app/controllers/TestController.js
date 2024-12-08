@@ -1,13 +1,7 @@
-
 class TestController {
   async test(req, res) {
-    return res.status(200).json({
-      status: "success",
-      data:{
-        body: req.body,
-        request: req.headers,
-      }
-    });
+    return res.status(200).json({ message: "Olá!" });
   }
 }
+
 export default new TestController();
