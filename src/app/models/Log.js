@@ -11,7 +11,8 @@ class Log extends Model {
         },
         pedidoId: DataTypes.BIGINT,
         descricao: DataTypes.STRING(200),
-        statusAtual: DataTypes.STRING(35),
+        statusAtual: DataTypes.STRING(60),
+        statusFinal: DataTypes.STRING(60),
         created_at: {
           type: DataTypes.DATE,
           allowNull: false,

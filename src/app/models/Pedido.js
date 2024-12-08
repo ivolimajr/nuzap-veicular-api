@@ -10,7 +10,7 @@ class Pedido extends Model {
           autoIncrement: true,
         },
         numeroPedido: DataTypes.BIGINT,
-        status: DataTypes.STRING(35),
+        status: DataTypes.STRING(60),
         valorLiquido: DataTypes.DECIMAL(5,2),
         valorPago: DataTypes.DECIMAL(5,2),
         created_at: {

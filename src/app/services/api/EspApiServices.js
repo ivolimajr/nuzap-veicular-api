@@ -25,10 +25,10 @@ class EspApiServices {
     this.#authInterceptor();
   }
 
-  async checkOrder({ epsOrderCode }) {
+  async checkOrder({ numeroPedido }) {
     try {
       await this.#setToken();
-      const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/pagamento/ConsultarStatusPedido?CodigoPedido=${epsOrderCode}`;
+      const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/pagamento/ConsultarStatusPedido?CodigoPedido=${numeroPedido}`;
       const result = await this.#client.get(url);
       return result.data;
     } catch (e) {

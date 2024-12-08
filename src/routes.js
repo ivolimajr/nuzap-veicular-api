@@ -9,10 +9,10 @@ routes.get("/",TestController.test);
 
 routes.use(auth);
 
-
 //rota privada
-routes.get("/vehicle/check-order/:epsOrderCode",EpsController.checkOrder);
-routes.get("/vehicle/check-orders",EpsController.checkOrders);
+routes.get("/veiculo/buscar-numero-pedido/:numeroPedido",EpsController.checkOrderByOrderNumber);
+routes.get("/veiculo/buscar-pedido/:id",EpsController.checkOrderById);
+routes.get("/veiculo/buscar-todos-pedidos",EpsController.checkOrders);
 
 export default routes;
 

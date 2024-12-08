@@ -1,20 +1,106 @@
+import { Op } from "sequelize";
 import EspApiServices from "../api/EspApiServices.js";
-import { EPSMockRequestCodigosPedido } from "../../mock/epsMock.js";
+import LogServices from "./logServices.js";
 import CustomException from "../../../config/CustomException.js";
+import Pedido from "../../models/Pedido.js";
 
 class EpsServices {
-  async checkOrders() {
-      const result = [];
-      for (const e of EPSMockRequestCodigosPedido)
-        result.push(await this.checkOrder({ epsOrderCode: e }));
-      return result;
+  #sleepTime = Number(process.env.CONSULTA_SLEEP_TIME) || 1000;
+
+  async checkAllOrders() {
+    const pedidos = await this.#getAllOrdersPending();
+    const results = [];
+
+    for (const pedido of pedidos) {
+      try {
+        const checkedOrder = await this.#checkOrder(pedido);
+        results.push(checkedOrder);
+      } catch (error) {
+        console.error(
+          `Erro ao verificar pedido ${pedido.numeroPedido}:`,
+          error.message,
+        );
+      }
+
+      // Pausa entre as verificações
+      await this.#delay();
+    }
+
+    return results;
   }
 
-  async checkOrder({ epsOrderCode }) {
-    if (!epsOrderCode || epsOrderCode <= 0)
-      throw new CustomException(404,"Verifique o número do pedido informa");
+  async checkOrderByOrderNumber(numeroPedido) {
+    const pedido = await Pedido.findOne({
+      where: { numeroPedido },
+      attributes: ["id", "numeroPedido", "status"],
+    });
+    return await this.#checkOrder(pedido);
+  }
 
-      return await EspApiServices.checkOrder({ epsOrderCode });
+  async checkOrderById(pedidoId) {
+    const pedido = await Pedido.findByPk(pedidoId, {
+      attributes: ["id", "numeroPedido", "status"],
+    });
+    return await this.#checkOrder(pedido);
+  }
+
+  async #checkOrder(pedido) {
+    if (!pedido || !pedido.id)
+      throw new CustomException(400, "Verifique o número do pedido informado");
+
+    try {
+      // Consulta à API externa
+      const apiResult = await EspApiServices.checkOrder({
+        numeroPedido: pedido.numeroPedido,
+      });
+
+      // Registrar log
+      await LogServices.registerLog({
+        pedidoId: pedido.id,
+        statusAtual: pedido.status,
+        statusFinal: apiResult.data?.status || "Sem retorno de status",
+        descricao: JSON.stringify(apiResult.data),
+      });
+
+      // Atualizar status do pedido se necessário
+      if (
+        apiResult.success &&
+        apiResult.data?.status &&
+        apiResult.data.status !== pedido.status
+      ) {
+        pedido.status = apiResult.data.status;
+        await pedido.save();
+
+        // TODO: Implementar notificação via WhatsApp
+      }
+
+      return pedido;
+    } catch (error) {
+      throw new CustomException(500, "Erro ao processar o pedido");
+    }
+  }
+
+  async #getAllOrdersPending() {
+    const keywords = [
+      "Aguardando",
+      "Análise",
+      "Analise",
+      "Parcial",
+      "Pendente",
+    ];
+
+    return await Pedido.findAll({
+      where: {
+        [Op.or]: keywords.map((word) => ({
+          status: { [Op.iLike]: `%${word}%` },
+        })),
+      },
+      attributes: ["id", "numeroPedido", "status"],
+    });
+  }
+
+  async #delay() {
+    return new Promise((resolve) => setTimeout(resolve, this.#sleepTime));
   }
 }
 
