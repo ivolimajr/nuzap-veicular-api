@@ -3,6 +3,7 @@ import EpsController from "./app/controllers/EpsController.js";
 import TestController from "./app/controllers/TestController.js";
 import auth from "./app/middlewares/authMiddleware.js";
 import LogController from "./app/controllers/LogController.js";
+
 const routes = new Router();
 
 //rota publica
@@ -18,6 +19,7 @@ routes.get(
   "/veiculo/buscar-numero-pedido/:numeroPedido",
   EpsController.checkOrderByOrderNumber,
 );
+routes.get("/veiculo/consulta-direta/:numeroPedido", EpsController.directCheckOrderNumber);
 routes.get("/veiculo/buscar-pedido/:id", EpsController.checkOrderById);
 routes.get("/veiculo/buscar-todos-pedidos", EpsController.checkOrders);
 

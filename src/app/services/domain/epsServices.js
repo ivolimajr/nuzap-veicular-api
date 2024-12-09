@@ -44,6 +44,21 @@ class EpsServices {
     return await this.#checkOrder(pedido);
   }
 
+  async directCheck(numeroPedido){
+    if (!numeroPedido || numeroPedido <= 0)
+      throw new CustomException(400, "Verifique o número do pedido informado");
+
+    try {
+      // Consulta à API externa
+      return await EspApiServices.checkOrder({
+        numeroPedido: numeroPedido,
+      });
+    } catch (error) {
+      throw new CustomException(500, "Erro ao processar o pedido");
+    }
+  }
+
+
   async #checkOrder(pedido) {
     if (!pedido || !pedido.id)
       throw new CustomException(400, "Verifique o número do pedido informado");

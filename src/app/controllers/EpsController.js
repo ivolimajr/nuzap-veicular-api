@@ -37,6 +37,19 @@ class EpsController {
       });
     }
   }
+  async directCheckOrderNumber(req, res) {
+    try {
+      const numeroPedido = Number(req.params.numeroPedido);
+      return res
+        .status(200)
+        .json(await EpsServices.directCheck(numeroPedido));
+    } catch (e) {
+      return res.status(e.status || 500).json({
+        error: e.message,
+        data: e.data,
+      });
+    }
+  }
 }
 
 export default new EpsController();
