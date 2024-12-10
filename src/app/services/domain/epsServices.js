@@ -16,10 +16,7 @@ class EpsServices {
         const checkedOrder = await this.#checkOrder(pedido);
         results.push(checkedOrder);
       } catch (error) {
-        console.error(
-          `Erro ao verificar pedido ${pedido.numeroPedido}:`,
-          error.message,
-        );
+        throw error;
       }
 
       // Pausa entre as verificações
@@ -54,7 +51,7 @@ class EpsServices {
         numeroPedido: numeroPedido,
       });
     } catch (error) {
-      throw new CustomException(500, "Erro ao processar o pedido");
+      throw error;
     }
   }
 
@@ -91,7 +88,7 @@ class EpsServices {
 
       return pedido;
     } catch (error) {
-      throw new CustomException(500, "Erro ao processar o pedido");
+      throw error;
     }
   }
 

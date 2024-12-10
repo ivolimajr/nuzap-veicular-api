@@ -1,9 +1,9 @@
 class CustomException extends Error {
-  constructor(status, message, data) {
+  constructor(status, message, userMessage) {
     super(message);
     this.name = this.constructor.name;
     this.status = status || 500;
-    this.data = data || null;
+    this.userMessage = userMessage;
     this.stack = new Error().stack;
   }
 }
