@@ -8,7 +8,7 @@ class TestController {
   testSentry(req, res) {
     throw new Error("Testing Sentry error!");
   }
-  async testDbConnection(req, res) {
+  async testDbConnection(req, res, next) {
     try {
       const logs = await Log.findAll({
         limit: 10,
@@ -17,8 +17,7 @@ class TestController {
 
       return res.status(200).json(logs);
     } catch (error) {
-      console.error("Erro ao buscar logs:", error);
-      return res.status(500).json({ error: "Erro ao processar a requisição" });
+      next(error);
     }
   }
 }

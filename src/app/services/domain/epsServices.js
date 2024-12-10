@@ -16,10 +16,7 @@ class EpsServices {
         const checkedOrder = await this.#checkOrder(pedido);
         results.push(checkedOrder);
       } catch (error) {
-        console.error(
-          `Erro ao verificar pedido ${pedido.numeroPedido}:`,
-          error.message,
-        );
+        throw error;
       }
 
       // Pausa entre as verificações
@@ -43,6 +40,21 @@ class EpsServices {
     });
     return await this.#checkOrder(pedido);
   }
+
+  async directCheck(numeroPedido){
+    if (!numeroPedido || numeroPedido <= 0)
+      throw new CustomException(400, "Verifique o número do pedido informado");
+
+    try {
+      // Consulta à API externa
+      return await EspApiServices.checkOrder({
+        numeroPedido: numeroPedido,
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
 
   async #checkOrder(pedido) {
     if (!pedido || !pedido.id)
@@ -76,7 +88,7 @@ class EpsServices {
 
       return pedido;
     } catch (error) {
-      throw new CustomException(500, "Erro ao processar o pedido");
+      throw error;
     }
   }
 

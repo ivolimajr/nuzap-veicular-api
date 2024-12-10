@@ -31,8 +31,8 @@ class EspApiServices {
       const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/pagamento/ConsultarStatusPedido?CodigoPedido=${numeroPedido}`;
       const result = await this.#client.get(url);
       return result.data;
-    } catch (e) {
-      throw new CustomException(e.status, e.message);
+    } catch (error) {
+      throw new CustomException(error.status,error.message,"Falha na consulta de débitos")
     }
   }
 
@@ -40,8 +40,8 @@ class EspApiServices {
     if (this.#token && this.#tokenExpiresAt > Date.now()) return this.#token;
     try {
       await this.#generateToken();
-    } catch (e) {
-      throw new CustomException(e.status, e.message);
+    } catch (error) {
+      throw error
     }
   }
 
@@ -54,8 +54,8 @@ class EspApiServices {
       });
       this.#setTokenProperties({ token: result.data.token });
       return result.data.token;
-    } catch (e) {
-      throw new CustomException(e.status, e.statusText || e.message);
+    } catch (error) {
+      throw new CustomException(error.status,error.message,"Falha na autenticação")
     }
   }
 
