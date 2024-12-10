@@ -28,7 +28,7 @@ class App {
   }
 
   startCronJobs() {
-    setupCronJobs(); // Configura e inicia os cron jobs
+    // setupCronJobs(); // Configura e inicia os cron jobs
   }
 }
 

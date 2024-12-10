@@ -25,6 +25,19 @@ class EspApiServices {
     this.#authInterceptor();
   }
 
+  async checkPlate({ plate }) {
+    try {
+      await this.#setToken();
+      const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/ConsultaPlaca`;
+      const result = await this.#client.post(url,{
+        placa: plate
+      });
+      return result.data;
+    } catch (error) {
+      console.log(error);
+      throw new CustomException(error.status,error.message,"Falha na consulta de placa")
+    }
+  }
   async checkOrder({ numeroPedido }) {
     try {
       await this.#setToken();
@@ -52,9 +65,11 @@ class EspApiServices {
         email: this.#EPS_CLIENT_ID,
         senha: this.#EPS_CLIENT_SECRET,
       });
+      console.error(result)
       this.#setTokenProperties({ token: result.data.token });
       return result.data.token;
     } catch (error) {
+      console.error(error)
       throw new CustomException(error.status,error.message,"Falha na autenticação")
     }
   }

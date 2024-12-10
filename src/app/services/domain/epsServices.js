@@ -41,7 +41,7 @@ class EpsServices {
     return await this.#checkOrder(pedido);
   }
 
-  async directCheck(numeroPedido){
+  async directCheck(numeroPedido) {
     if (!numeroPedido || numeroPedido <= 0)
       throw new CustomException(400, "Verifique o número do pedido informado");
 
@@ -55,6 +55,17 @@ class EpsServices {
     }
   }
 
+  async checkPlate(plate) {
+    if (!plate || plate <= 0)
+      throw new CustomException(400, "Verifique o número da placa informada");
+
+    try {
+      // Consulta à API externa
+      return await EspApiServices.checkPlate({ plate: plate });
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async #checkOrder(pedido) {
     if (!pedido || !pedido.id)

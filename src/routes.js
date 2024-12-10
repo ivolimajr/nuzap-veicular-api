@@ -20,6 +20,7 @@ routes.get(
   EpsController.checkOrderByOrderNumber,
 );
 routes.get("/veiculo/consulta-direta/:numeroPedido", EpsController.directCheckOrderNumber);
+routes.get("/veiculo/consulta-placa/:placa", EpsController.checkPlate);
 routes.get("/veiculo/buscar-pedido/:id", EpsController.checkOrderById);
 routes.get("/veiculo/buscar-todos-pedidos", EpsController.checkOrders);
 

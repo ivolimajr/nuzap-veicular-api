@@ -37,6 +37,14 @@ class EpsController {
       next(error);
     }
   }
+  async checkPlate(req, res, next) {
+    try {
+      const placa = req.params.placa;
+      return res.status(200).json(await EpsServices.checkPlate(placa));
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new EpsController();
