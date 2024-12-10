@@ -12,6 +12,8 @@ COPY package*.json ./
 # Instalar as dependências
 RUN npm install
 
+RUN apt-get update && apt-get install -y curl
+
 # Copiar o restante dos arquivos do projeto
 COPY --chown=node:node . .
 
