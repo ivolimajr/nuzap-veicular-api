@@ -1,18 +1,24 @@
 import cron from "node-cron";
+import EpsServices from "../domain/epsServices.js";
 
-async function setupCronJobs() {
+async function checkAllOrders() {
   try {
-    console.log("Initializing cron jobs...");
+    const cronTime = process.env.CONSULTA_CRON_TIME;
+    if (!cronTime) {
+      console.error("No cron jobs enabled.");
+      return null;
+    }
 
     // Define o job para ser executado a cada 30 segundos
-    cron.schedule("*/1 * * * * *", async () => {
-      console.log(`Log message at ${new Date().toISOString()}`);
+    cron.schedule(cronTime, async () => {
+      console.info(
+        `Initializing checkAllOrders job - ${cronTime} ...`,
+      );
+      await EpsServices.checkAllOrders();
     });
-
-    console.log("Cron job 'log-message' scheduled to run every 30 seconds");
   } catch (error) {
     console.error("Error setting up cron jobs:", error);
   }
 }
 
-export default setupCronJobs;
+export default checkAllOrders;

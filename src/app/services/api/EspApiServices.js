@@ -65,7 +65,6 @@ class EspApiServices {
         email: this.#EPS_CLIENT_ID,
         senha: this.#EPS_CLIENT_SECRET,
       });
-      console.error(result)
       this.#setTokenProperties({ token: result.data.token });
       return result.data.token;
     } catch (error) {

@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 
 class LogServices {
   async registerLog({ pedidoId, statusAtual, descricao, statusFinal }) {
-    return await Log.create({
+    await Log.create({
       pedidoId,
       statusAtual,
       statusFinal,

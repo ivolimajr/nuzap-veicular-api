@@ -9,8 +9,10 @@ class EpsServices {
 
   async checkAllOrders() {
     const pedidos = await this.#getAllOrdersPending();
-    const results = [];
+    console.info(`Total de ${pedidos.length} pendente atualizar`);
+    if (!pedidos || pedidos.length === 0) return pedidos;
 
+    const results = [];
     for (const pedido of pedidos) {
       try {
         const checkedOrder = await this.#checkOrder(pedido);

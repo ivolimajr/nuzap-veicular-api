@@ -4,7 +4,7 @@ import express from "express";
 import routes from "./routes.js";
 import "./config/database/index.js";
 import errorHandler from "./app/middlewares/errorMiddleware.js";
-import setupCronJobs from "./app/services/jobs/taskServices.js"; // Importa os jobs do Node-Cron
+import checkAllOrders from "./app/services/jobs/taskServices.js";
 
 class App {
   constructor() {
@@ -28,7 +28,7 @@ class App {
   }
 
   startCronJobs() {
-    // setupCronJobs(); // Configura e inicia os cron jobs
+    checkAllOrders(); // Configura e inicia os cron jobs
   }
 }
 
