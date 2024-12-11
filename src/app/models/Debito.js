@@ -38,7 +38,7 @@ class Debito extends Model {
     return this;
   }
   static associate(models) {
-    this.belongsTo(models.Pedido, { foreignKey: "pedidoId", as: "Pedido" });
+    this.belongsTo(models.Pedido, { foreignKey: "pedidoId"});
   }
 }
 

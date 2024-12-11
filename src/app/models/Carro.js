@@ -37,8 +37,8 @@ class Carro extends Model {
     return this;
   }
   static associate(models) {
-    this.belongsTo(models.User, { foreignKey: "userId", as: "User" });
-    this.hasMany(models.Pedido, { foreignKey: "pedidoId", as: "Pedidos" });
+    this.belongsTo(models.User, { foreignKey: "userId"});
+    this.hasMany(models.Pedido, { foreignKey: "pedidoId"});
   }
 }
 

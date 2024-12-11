@@ -15,14 +15,11 @@ RUN npm install
 # Instalar o curl usando apk
 RUN apk add --no-cache curl
 
-# Comando para exibir o IP de saída
-RUN curl -s https://ifconfig.me > /home/node/app/ip.txt
-
 # Copiar o restante dos arquivos do projeto
 COPY --chown=node:node . .
 
 # Expor a porta configurada
 EXPOSE 8080
 
-# Exibir o IP de saída no log ao iniciar o contêiner
-CMD ["sh", "-c", "echo 'IP de saída:' && cat /home/node/app/ip.txt && node index.js"]
+# Iniciar a aplicação com o arquivo index.js
+CMD ["node", "index.js"]
