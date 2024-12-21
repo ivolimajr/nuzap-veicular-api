@@ -29,15 +29,20 @@ class EspApiServices {
     try {
       await this.#setToken();
       const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/ConsultaPlaca`;
-      const result = await this.#client.post(url,{
-        placa: plate
+      const result = await this.#client.post(url, {
+        placa: plate,
       });
       return result.data;
     } catch (error) {
-      console.log(error);
-      throw new CustomException(error.status,error.message,"Falha na consulta de placa")
+      console.error(error);
+      throw new CustomException(
+        error.status,
+        error.message,
+        "Falha na consulta de placa",
+      );
     }
   }
+
   async checkOrder({ numeroPedido }) {
     try {
       await this.#setToken();
@@ -45,19 +50,41 @@ class EspApiServices {
       const result = await this.#client.get(url);
       return result.data;
     } catch (error) {
-      throw new CustomException(error.status,error.message,"Falha na consulta de débitos")
+      console.error(error);
+      throw new CustomException(
+        error.status,
+        error.message,
+        "Falha na consulta de débitos",
+      );
     }
   }
 
   async #setToken() {
     if (this.#token && this.#tokenExpiresAt > Date.now()) return this.#token;
     try {
-      await this.#generateToken();
+      return await this.#generateToken();
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
+  async testPNHAuth() {
+    try {
+      const url = `${this.#EPS_BASE_URL}/login/${this.#EPS_API_AUTH_VERSION}/login`;
+      const result = await this.#client.post(url, {
+        email: this.#EPS_CLIENT_ID,
+        senha: this.#EPS_CLIENT_SECRET,
+      });
+      return result.data;
+    } catch (error) {
+      console.error(error);
+      throw new CustomException(
+        error.status,
+        error.message,
+        "Falha na autenticação",
+      );
+    }
+  }
   async #generateToken() {
     try {
       const url = `${this.#EPS_BASE_URL}/login/${this.#EPS_API_AUTH_VERSION}/login`;
@@ -68,8 +95,12 @@ class EspApiServices {
       this.#setTokenProperties({ token: result.data.token });
       return result.data.token;
     } catch (error) {
-      console.error(error)
-      throw new CustomException(error.status,error.message,"Falha na autenticação")
+      console.error(error);
+      throw new CustomException(
+        error.status,
+        error.message,
+        "Falha na autenticação",
+      );
     }
   }
 

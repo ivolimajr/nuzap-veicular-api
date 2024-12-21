@@ -1,4 +1,5 @@
 import Log from "../models/Log.js";
+import EspServices from "../services/domain/epsServices.js"
 
 class TestController {
   async test(req, res) {
@@ -8,6 +9,7 @@ class TestController {
   testSentry(req, res) {
     throw new Error("Testing Sentry error!");
   }
+
   async testDbConnection(req, res, next) {
     try {
       const logs = await Log.findAll({
@@ -16,6 +18,15 @@ class TestController {
       });
 
       return res.status(200).json(logs);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async testApiAuth(req, res, next) {
+    try {
+      const result = await EspServices.testPNHAuth()
+      return res.status(200).json(result);
     } catch (error) {
       next(error);
     }

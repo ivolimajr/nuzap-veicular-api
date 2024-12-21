@@ -77,6 +77,14 @@ class EpsServices {
     }
   }
 
+  async testPNHAuth() {
+    try {
+      return await EspApiServices.testPNHAuth();
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async #checkOrder(pedido) {
     if (!pedido || !pedido.id)
       throw new CustomException(400, "Verifique o número do pedido informado");

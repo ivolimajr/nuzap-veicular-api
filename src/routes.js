@@ -19,6 +19,7 @@ routes.get(
   "/veiculo/buscar-numero-pedido/:numeroPedido",
   EpsController.checkOrderByOrderNumber,
 );
+routes.get("/veiculo/test-pnh-auth", TestController.testApiAuth);
 routes.get("/veiculo/consulta-direta/:numeroPedido", EpsController.directCheckOrderNumber);
 routes.get("/veiculo/consulta-placa/:placa", EpsController.checkPlate);
 routes.get("/veiculo/buscar-pedido/:id", EpsController.checkOrderById);
