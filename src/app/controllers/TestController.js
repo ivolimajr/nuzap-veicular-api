@@ -1,5 +1,5 @@
 import Log from "../models/Log.js";
-import EspServices from "../services/domain/epsServices.js"
+import EspServices from "../services/domain/BaseServices.js"
 
 class TestController {
   async test(req, res) {
@@ -25,7 +25,7 @@ class TestController {
 
   async testApiAuth(req, res, next) {
     try {
-      const result = await EspServices.testPNHAuth()
+      const result = await EspServices.testeApiAuth()
       return res.status(200).json(result);
     } catch (error) {
       next(error);

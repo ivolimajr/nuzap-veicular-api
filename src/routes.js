@@ -1,5 +1,5 @@
 import { Router } from "express";
-import EpsController from "./app/controllers/EpsController.js";
+import EpsController from "./app/controllers/VeicularController.js";
 import TestController from "./app/controllers/TestController.js";
 import auth from "./app/middlewares/authMiddleware.js";
 import LogController from "./app/controllers/LogController.js";
@@ -15,14 +15,8 @@ routes.get("/get-log", LogController.getLog);
 routes.use(auth);
 
 //rota privada
-routes.get(
-  "/veiculo/buscar-numero-pedido/:numeroPedido",
-  EpsController.checkOrderByOrderNumber,
-);
-routes.get("/veiculo/test-pnh-auth", TestController.testApiAuth);
-routes.get("/veiculo/consulta-direta/:numeroPedido", EpsController.directCheckOrderNumber);
-routes.get("/veiculo/consulta-placa/:placa", EpsController.checkPlate);
-routes.get("/veiculo/buscar-pedido/:id", EpsController.checkOrderById);
-routes.get("/veiculo/buscar-todos-pedidos", EpsController.checkOrders);
+routes.get("/veiculo/testar-autenticacao-api", TestController.testApiAuth);
+routes.get("/veiculo/consultar-pedido/:numeroPedido", EpsController.consultarPedido);
+routes.get("/veiculo/consultar-placa/:placa", EpsController.consultarPlaca);
 
 export default routes;

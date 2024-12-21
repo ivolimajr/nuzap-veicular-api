@@ -2,7 +2,7 @@ import axios from "axios";
 import jwt from "jsonwebtoken";
 import CustomException from "../../../config/CustomException.js";
 
-class EspApiServices {
+class ApiServices {
   #client;
   #token = null;
   #tokenExpiresAt = 0;
@@ -25,7 +25,7 @@ class EspApiServices {
     this.#authInterceptor();
   }
 
-  async checkPlate({ plate }) {
+  async consultarPlaca({ plate }) {
     try {
       await this.#setToken();
       const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/ConsultaPlaca`;
@@ -43,7 +43,7 @@ class EspApiServices {
     }
   }
 
-  async checkOrder({ numeroPedido }) {
+  async consultarStatusPedido({ numeroPedido }) {
     try {
       await this.#setToken();
       const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/pagamento/ConsultarStatusPedido?CodigoPedido=${numeroPedido}`;
@@ -59,16 +59,7 @@ class EspApiServices {
     }
   }
 
-  async #setToken() {
-    if (this.#token && this.#tokenExpiresAt > Date.now()) return this.#token;
-    try {
-      return await this.#generateToken();
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  async testPNHAuth() {
+  async testeApiAuth() {
     try {
       const url = `${this.#EPS_BASE_URL}/login/${this.#EPS_API_AUTH_VERSION}/login`;
       const result = await this.#client.post(url, {
@@ -85,6 +76,7 @@ class EspApiServices {
       );
     }
   }
+
   async #generateToken() {
     try {
       const url = `${this.#EPS_BASE_URL}/login/${this.#EPS_API_AUTH_VERSION}/login`;
@@ -101,6 +93,15 @@ class EspApiServices {
         error.message,
         "Falha na autenticação",
       );
+    }
+  }
+
+  async #setToken() {
+    if (this.#token && this.#tokenExpiresAt > Date.now()) return this.#token;
+    try {
+      return await this.#generateToken();
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -131,4 +132,4 @@ class EspApiServices {
   }
 }
 
-export default new EspApiServices();
+export default new ApiServices();

@@ -1,4 +1,4 @@
-import LogServices from "../services/domain/logServices.js";
+import LogServices from "../services/domain/LogServices.js";
 
 class LogController {
   async getLog(req, res, next) {
