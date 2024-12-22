@@ -1,5 +1,5 @@
-import Log from "../models/Log.js";
-import EspServices from "../services/domain/BaseServices.js"
+import EspServices from "../services/domain/BaseServices.js";
+import Veiculo from "../models/Veiculo.js";
 
 class TestController {
   async test(req, res) {
@@ -12,7 +12,7 @@ class TestController {
 
   async testDbConnection(req, res, next) {
     try {
-      const logs = await Log.findAll({
+      const logs = await Veiculo.findAll({
         limit: 10,
         order: [["created_at", "DESC"]],
       });
@@ -25,7 +25,7 @@ class TestController {
 
   async testApiAuth(req, res, next) {
     try {
-      const result = await EspServices.testeApiAuth()
+      const result = await EspServices.testeApiAuth();
       return res.status(200).json(result);
     } catch (error) {
       next(error);

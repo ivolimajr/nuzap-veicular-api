@@ -2,7 +2,6 @@ import ApiServices from "../api/ApiServices.js";
 import CustomException from "../../../config/CustomException.js";
 
 class BaseServices {
-
   async consultarPedido(numeroPedido) {
     if (!numeroPedido || numeroPedido <= 0)
       throw new CustomException(400, "Verifique o número do pedido informado");

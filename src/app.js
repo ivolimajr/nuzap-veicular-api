@@ -24,7 +24,6 @@ class App {
   errorHandler() {
     this.server.use(errorHandler);
   }
-
 }
 
 export default new App().server;

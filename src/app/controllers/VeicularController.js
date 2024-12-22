@@ -1,11 +1,12 @@
 import BaseServices from "../services/domain/BaseServices.js";
 
 class VeicularController {
-
   async consultarPedido(req, res, next) {
     try {
       const numeroPedido = Number(req.params.numeroPedido);
-      return res.status(200).json(await BaseServices.consultarPedido(numeroPedido));
+      return res
+        .status(200)
+        .json(await BaseServices.consultarPedido(numeroPedido));
     } catch (error) {
       next(error);
     }

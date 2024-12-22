@@ -16,7 +16,10 @@ routes.use(auth);
 
 //rota privada
 routes.get("/veiculo/testar-autenticacao-api", TestController.testApiAuth);
-routes.get("/veiculo/consultar-pedido/:numeroPedido", EpsController.consultarPedido);
+routes.get(
+  "/veiculo/consultar-pedido/:numeroPedido",
+  EpsController.consultarPedido,
+);
 routes.get("/veiculo/consultar-placa/:placa", EpsController.consultarPlaca);
 
 export default routes;

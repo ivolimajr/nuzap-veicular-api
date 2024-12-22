@@ -9,7 +9,6 @@ class Log extends Model {
           primaryKey: true,
           autoIncrement: true,
         },
-        pedidoId: DataTypes.BIGINT,
         descricao: DataTypes.STRING(200),
         statusAtual: DataTypes.STRING(60),
         statusFinal: DataTypes.STRING(60),
@@ -21,14 +20,11 @@ class Log extends Model {
       },
       {
         sequelize,
-        tableName: "parcelatudo_log",
+        tableName: "log",
         timestamps: false,
       },
     );
     return this;
-  }
-  static associate(models) {
-    this.belongsTo(models.Pedido, { foreignKey: "pedidoId"});
   }
 }
 
