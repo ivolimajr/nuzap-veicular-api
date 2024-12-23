@@ -1,17 +1,22 @@
 import { Router } from "express";
+import EpsController from "./app/controllers/VeicularController.js";
+import TestController from "./app/controllers/TestController.js";
+import auth from "./app/middlewares/authMiddleware.js";
+import LogController from "./app/controllers/LogController.js";
 
 const routes = new Router();
 
-routes.get("/", (req, res) => {
-  res.status(200).send({ mensagem: "Tarefa executada com sucesso!" });
-});
+//rota publica
+routes.get("/", TestController.test);
+routes.get("/sentry", TestController.testSentry);
+routes.get("/test-db-connection", TestController.testDbConnection);
+routes.get("/get-log", LogController.getLog);
 
-routes.post("/executar-tarefa", (req, res) => {
-  console.log("Tarefa executada!");
-  res
-    .status(200)
-    .send({ mensagem: "Tarefa executada com sucesso!", data: req.body });
-});
+routes.use(auth);
 
-// Remova o parêntese e exporte diretamente a instância `routes`.
+//rota privada
+routes.get("/veiculo/testar-autenticacao-api", TestController.testApiAuth);
+routes.get("/veiculo/consultar-pedido/:numeroPedido", EpsController.consultarPedido);
+routes.get("/veiculo/consultar-placa/:placa", EpsController.consultarPlaca);
+
 export default routes;

@@ -12,11 +12,14 @@ COPY package*.json ./
 # Instalar as dependências
 RUN npm install
 
+# Instalar o curl usando apk
+RUN apk add --no-cache curl
+
 # Copiar o restante dos arquivos do projeto
 COPY --chown=node:node . .
 
 # Expor a porta configurada
-EXPOSE 3333
+EXPOSE 8080
 
 # Iniciar a aplicação com o arquivo index.js
 CMD ["node", "index.js"]
