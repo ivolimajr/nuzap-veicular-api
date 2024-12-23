@@ -21,5 +21,6 @@ routes.get(
   EpsController.consultarPedido,
 );
 routes.get("/veiculo/consultar-placa/:placa", EpsController.consultarPlaca);
+routes.post("/veiculo/consultar-debitos", EpsController.consultarDebitos);
 
 export default routes;

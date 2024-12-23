@@ -57,7 +57,6 @@ class LogServices {
         data: logs,
       });
     } catch (error) {
-      console.error("Erro ao buscar logs:", error);
       return res.status(500).json({ error: "Erro ao processar a requisição" });
     }
   }

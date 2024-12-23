@@ -1,6 +1,6 @@
 import Sequelize, { DataTypes, Model } from "sequelize";
 
-class Veiculo extends Model {
+class Pedido extends Model {
   static init(sequelize) {
     super.init(
       {
@@ -9,29 +9,16 @@ class Veiculo extends Model {
           autoIncrement: true,
           primaryKey: true,
         },
-        placa: {
-          type: DataTypes.STRING,
+        veiculoId: {
+          type: DataTypes.INTEGER,
           allowNull: false,
+          references: {
+            model: "veiculo",
+            key: "id",
+          },
         },
-        chassi: DataTypes.STRING,
-        renavam: DataTypes.STRING,
-        uf: DataTypes.STRING,
-        marcaModelo: {
-          type: DataTypes.STRING,
-          field: "marca_modelo",
-        },
-        anoFabricacao: {
-          type: DataTypes.STRING,
-          field: "ano_fabricacao",
-        },
-        anoModelo: {
-          type: DataTypes.STRING,
-          field: "ano_modelo",
-        },
-        cpfCnpj: {
-          type: DataTypes.STRING,
-          field: "cpf_cnpj",
-        },
+        pedido: DataTypes.INTEGER,
+        mensagem: DataTypes.TEXT,
         createdAt: {
           type: DataTypes.DATE,
           defaultValue: Sequelize.fn("NOW"),
@@ -45,7 +32,7 @@ class Veiculo extends Model {
       },
       {
         sequelize,
-        tableName: "veiculo",
+        tableName: "pedido",
         schema: "veicular",
         underscored: true, // Converte automaticamente camelCase para snake_case no banco
         timestamps: true, // Sequelize cuida de createdAt e updatedAt
@@ -53,9 +40,11 @@ class Veiculo extends Model {
     );
     return this;
   }
+
   static associate(models) {
-    this.hasMany(models.Pedido, { foreignKey: "veiculoId", as: "pedidos" });
+    this.belongsTo(models.Veiculo, { foreignKey: "veiculoId" });
+    this.hasMany(models.Debito, { foreignKey: "pedidoId", as: "debitos" });
   }
 }
 
-export default Veiculo;
+export default Pedido;

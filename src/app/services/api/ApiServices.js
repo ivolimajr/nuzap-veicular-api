@@ -25,16 +25,13 @@ class ApiServices {
     this.#authInterceptor();
   }
 
-  async consultarPlaca({ plate }) {
+  async consultarPlaca(placa) {
     try {
       await this.#setToken();
       const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/ConsultaPlaca`;
-      const result = await this.#client.post(url, {
-        placa: plate,
-      });
+      const result = await this.#client.post(url, { placa });
       return result.data;
     } catch (error) {
-      console.error(error);
       throw new CustomException(
         error.status,
         error.message,
@@ -43,14 +40,44 @@ class ApiServices {
     }
   }
 
-  async consultarStatusPedido({ numeroPedido }) {
+  async consultaDebitos({
+    placa,
+    renavam,
+    chassi,
+    uf,
+    cpfCnpj,
+    email,
+    telefone,
+  }) {
+    try {
+      await this.#setToken();
+      const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/ConsultaDebito`;
+      const result = await this.#client.post(url, {
+        cpf: cpfCnpj,
+        uf,
+        placa,
+        renavam,
+        email,
+        telefone,
+        chassi,
+      });
+      return result.data;
+    } catch (error) {
+      throw new CustomException(
+        error.status,
+        error.message,
+        "Falha na consulta de debitos",
+      );
+    }
+  }
+
+  async consultarStatusPedido(numeroPedido) {
     try {
       await this.#setToken();
       const url = `${this.#EPS_BASE_URL}/api/${this.#EPS_API_VERSION}/pagamento/ConsultarStatusPedido?CodigoPedido=${numeroPedido}`;
       const result = await this.#client.get(url);
       return result.data;
     } catch (error) {
-      console.error(error);
       throw new CustomException(
         error.status,
         error.message,
@@ -68,7 +95,6 @@ class ApiServices {
       });
       return result.data;
     } catch (error) {
-      console.error(error);
       throw new CustomException(
         error.status,
         error.message,
@@ -87,7 +113,6 @@ class ApiServices {
       this.#setTokenProperties({ token: result.data.token });
       return result.data.token;
     } catch (error) {
-      console.error(error);
       throw new CustomException(
         error.status,
         error.message,

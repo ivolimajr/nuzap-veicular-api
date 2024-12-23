@@ -20,6 +20,17 @@ class VeicularController {
       next(error);
     }
   }
+
+  async consultarDebitos(req, res, next) {
+    try {
+      const { placa, email, telefone } = req.body;
+      return res
+        .status(200)
+        .json(await BaseServices.consultaDebitos({ placa, email, telefone }));
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new VeicularController();
