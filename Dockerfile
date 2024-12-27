@@ -12,7 +12,7 @@ COPY tsconfig*.json ./
 RUN npm install
 
 # Instalar o curl usando apk
-RUN apk add --no-cache curl
+#RUN apk add --no-cache curl
 
 # Copia o restante do código para o contêiner
 COPY . .
