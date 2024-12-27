@@ -1,5 +1,4 @@
 import { Injectable, HttpException } from '@nestjs/common';
-import moment from 'moment';
 import { ApiService } from '../api/api.service';
 import { VeiculoService } from '../domain/veiculo.service';
 import { ConsultaPlacaResponse } from '../../models/application/ConsultaPlaca/ConsultaPlacaResponse';
@@ -10,6 +9,7 @@ import { ConsultaDebitoRequest } from '../../models/application/consultaDebito/C
 import { ConsultaDebitoResponse } from '../../models/application/consultaDebito/ConsultaDebitoResponse';
 import { DebitoService } from '../domain/debito.service';
 import { ConsultaPedidoResponse } from '../../models/application/ConsultaPedido/ConsultaPedidoResponse';
+import * as moment from "moment";
 
 @Injectable()
 export class BaseService {
