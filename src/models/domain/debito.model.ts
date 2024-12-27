@@ -7,7 +7,6 @@ import {
   BelongsTo,
 } from 'sequelize-typescript';
 import { Pedido } from './pedido.model';
-import { DataTypes } from "sequelize"; // Certifique-se de ajustar o caminho
 
 @Table({
   tableName: 'debito',
@@ -46,7 +45,7 @@ export class Debito extends Model<Debito> {
 
   @Column({
     type: DataType.STRING(25),
-    field: "status_debito",
+    field: 'status_debito',
     allowNull: true,
   })
   statusDebito!: string;

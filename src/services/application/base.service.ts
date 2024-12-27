@@ -9,7 +9,8 @@ import { ConsultaDebitoRequest } from '../../models/application/consultaDebito/C
 import { ConsultaDebitoResponse } from '../../models/application/consultaDebito/ConsultaDebitoResponse';
 import { DebitoService } from '../domain/debito.service';
 import { ConsultaPedidoResponse } from '../../models/application/ConsultaPedido/ConsultaPedidoResponse';
-import * as moment from "moment";
+import * as moment from 'moment';
+import { getDigits } from '../../utils/stringUtils';
 
 @Injectable()
 export class BaseService {
@@ -30,9 +31,11 @@ export class BaseService {
     if (!numeroPedido || numeroPedido <= 0)
       throw new HttpException('Número do pedido inválido', 400);
 
-    const apiResponse = await this.apiService.consultarStatusPedido(numeroPedido);
+    const apiResponse =
+      await this.apiService.consultarStatusPedido(numeroPedido);
 
-    const pedidoDb = await this.pedidoService.buscarPorNumeroPedido(numeroPedido);
+    const pedidoDb =
+      await this.pedidoService.buscarPorNumeroPedido(numeroPedido);
 
     if (pedidoDb && pedidoDb.status !== this.statusInicial) {
       const updatedData = { status: apiResponse.data.status };
@@ -64,7 +67,6 @@ export class BaseService {
     if (!apiResponse.resposta || !apiResponse.resposta.renavam)
       throw new HttpException('Erro na consulta de placa', 404);
 
-    console.log(apiResponse.resposta);
     const dbResult: Veiculo = await this.veiculoService.inserir({
       ...apiResponse.resposta,
       anoFabricacao: apiResponse.resposta.ano_fabricacao,
@@ -80,6 +82,8 @@ export class BaseService {
   async consultaDebitos(
     data: ConsultaDebitoRequest,
   ): Promise<ConsultaDebitoResponse> {
+    data.telefone = getDigits(data.telefone);
+
     const veiculoDb = await this.consultarPlaca(data.placa);
 
     const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculoDb.id);

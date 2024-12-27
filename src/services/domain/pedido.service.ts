@@ -66,8 +66,7 @@ export class PedidoService {
 
   async update(id: number, data: Partial<Pedido>): Promise<Pedido> {
     const pedido = await this.pedidoModel.findByPk(id);
-    if (!pedido)
-      throw new HttpException('Pedido não encontrado', 404);
+    if (!pedido) throw new HttpException('Pedido não encontrado', 404);
 
     try {
       return await pedido.update(data);

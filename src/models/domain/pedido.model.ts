@@ -4,8 +4,9 @@ import {
   Model,
   DataType,
   ForeignKey,
-  HasMany, BelongsTo
-} from "sequelize-typescript";
+  HasMany,
+  BelongsTo,
+} from 'sequelize-typescript';
 import { Veiculo } from './veiculo.model';
 import { Debito } from './debito.model';
 

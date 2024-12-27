@@ -13,14 +13,14 @@ import {
   ApiParam,
   ApiResponse,
   ApiSecurity,
-  ApiTags
-} from "@nestjs/swagger";
+  ApiTags,
+} from '@nestjs/swagger';
 import { BaseService } from '../services/application/base.service';
 import { ConsultaPlacaResponse } from '../models/application/ConsultaPlaca/ConsultaPlacaResponse';
 import { PNHConsultaDebitosRequest } from '../models/api/consultaDebito/PNHConsultaDebitosRequest';
-import { ConsultaDebitoRequest } from "../models/application/consultaDebito/ConsultaDebitoRequest";
-import { ConsultaDebitoResponse } from "../models/application/consultaDebito/ConsultaDebitoResponse";
-import { ConsultaPedidoResponse } from "../models/application/ConsultaPedido/ConsultaPedidoResponse";
+import { ConsultaDebitoRequest } from '../models/application/consultaDebito/ConsultaDebitoRequest';
+import { ConsultaDebitoResponse } from '../models/application/consultaDebito/ConsultaDebitoResponse';
+import { ConsultaPedidoResponse } from '../models/application/ConsultaPedido/ConsultaPedidoResponse';
 
 @ApiSecurity('x-api-key')
 @ApiTags('Veicular')
@@ -33,18 +33,22 @@ export class AppController {
    * @param numeroPedido Número do pedido a ser consultado.
    */
   @ApiOperation({ summary: 'Consultar o status de um pedido' })
-  @ApiParam({ name: 'numeroPedido', description: 'Numero do pedido', type: String })
+  @ApiParam({
+    name: 'numeroPedido',
+    description: 'Numero do pedido',
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'Informações do pedido',
     type: ConsultaPedidoResponse,
   })
   @Get('consultar-pedido/:numeroPedido')
-  async consultarPedido(@Param('numeroPedido') numeroPedido: string): Promise<ConsultaPedidoResponse> {
+  async consultarPedido(
+    @Param('numeroPedido') numeroPedido: string,
+  ): Promise<ConsultaPedidoResponse> {
     try {
-      return await this.baseService.consultarPedido(
-        Number(numeroPedido),
-      );
+      return await this.baseService.consultarPedido(Number(numeroPedido));
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

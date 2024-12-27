@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { DomainModule } from './services/domain.module';
@@ -6,8 +6,8 @@ import { AppController } from './controllers/app.controller';
 import { ApiService } from './services/api/api.service';
 import { HttpModule } from '@nestjs/axios';
 import { BaseService } from './services/application/base.service';
-import * as process from "process";
-import { ApiKeyMiddleware } from "./middleares/key.middleware";
+import * as process from 'process';
+import { ApiKeyMiddleware } from './middleares/key.middleware';
 
 @Module({
   imports: [
@@ -23,14 +23,14 @@ import { ApiKeyMiddleware } from "./middleares/key.middleware";
       models: [],
       autoLoadModels: true,
       synchronize: false,
-      timezone: "-03:00"
+      timezone: '-03:00',
     }),
     DomainModule,
   ],
   controllers: [AppController],
   providers: [ApiService, BaseService],
 })
-export class AppModule implements  NestModule{
+export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(ApiKeyMiddleware) // Aplica o middleware

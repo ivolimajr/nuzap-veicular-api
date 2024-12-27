@@ -1,3 +1,3 @@
 export class PNHConsultaPlacaRequest {
-  placa: string
+  placa: string;
 }

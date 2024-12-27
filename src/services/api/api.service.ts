@@ -4,11 +4,11 @@ import { Buffer } from 'buffer';
 import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import * as process from 'process';
-import { PNHConsultaPlacaResponse } from "../../models/api/consultaPlaca/PNHConsultaPlacaResponse";
-import { PNHConsultaDebitosRequest } from "../../models/api/consultaDebito/PNHConsultaDebitosRequest";
-import { PNHConsultaDebitosResponse } from "../../models/api/consultaDebito/PNHConsultaDebitosResponse";
-import { PNHConsultaPedidoResponse } from "../../models/api/consultaPedido/PNHConsultaPedidoResponse";
-import { PNHAutenticacaoResponse } from "../../models/api/autenticacao/PNHAutenticacaoResponse";
+import { PNHConsultaPlacaResponse } from '../../models/api/consultaPlaca/PNHConsultaPlacaResponse';
+import { PNHConsultaDebitosRequest } from '../../models/api/consultaDebito/PNHConsultaDebitosRequest';
+import { PNHConsultaDebitosResponse } from '../../models/api/consultaDebito/PNHConsultaDebitosResponse';
+import { PNHConsultaPedidoResponse } from '../../models/api/consultaPedido/PNHConsultaPedidoResponse';
+import { PNHAutenticacaoResponse } from '../../models/api/autenticacao/PNHAutenticacaoResponse';
 
 @Injectable()
 export class ApiService {
@@ -18,9 +18,7 @@ export class ApiService {
   private apiVersion: string = process.env.EPS_API_VERSION;
   private apiAuthVersion: string = process.env.EPS_API_AUTH_VERSION;
 
-  constructor(
-    private readonly httpService: HttpService,
-  ) {}
+  constructor(private readonly httpService: HttpService) {}
 
   async getToken(): Promise<string> {
     if (this.token && this.tokenExpiresAt > Date.now()) {

@@ -1,5 +1,10 @@
-import { Injectable, NestMiddleware, HttpException, HttpStatus } from '@nestjs/common';
-import * as process from "node:process";
+import {
+  Injectable,
+  NestMiddleware,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
+import * as process from 'node:process';
 
 @Injectable()
 export class ApiKeyMiddleware implements NestMiddleware {

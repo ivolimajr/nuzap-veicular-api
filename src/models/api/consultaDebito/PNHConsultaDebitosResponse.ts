@@ -1,4 +1,4 @@
-import { PNHDebitosResponse } from "./PNHDebitosResponse";
+import { PNHDebitosResponse } from './PNHDebitosResponse';
 
 export interface PNHConsultaDebitosResponse {
   success: boolean;
