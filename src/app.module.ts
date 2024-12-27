@@ -23,6 +23,7 @@ import { ApiKeyMiddleware } from "./middleares/key.middleware";
       models: [],
       autoLoadModels: true,
       synchronize: false,
+      timezone: "-03:00"
     }),
     DomainModule,
   ],
