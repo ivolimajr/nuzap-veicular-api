@@ -1,16 +1,23 @@
 import { Injectable, HttpException } from '@nestjs/common';
-import { ApiService } from '../api/api.service';
-import { VeiculoService } from '../domain/veiculo.service';
-import { ConsultaPlacaResponse } from '../../models/application/ConsultaPlaca/ConsultaPlacaResponse';
-import Veiculo from '../../models/domain/veiculo.model';
-import { PNHConsultaDebitoRequest } from '../../models/api/consultaDebito/PNHConsultaDebitoRequest';
-import { PedidoService } from '../domain/pedido.service';
-import { ConsultaDebitoRequest } from '../../models/application/consultaDebito/ConsultaDebitoRequest';
-import { ConsultaDebitoResponse } from '../../models/application/consultaDebito/ConsultaDebitoResponse';
-import { DebitoService } from '../domain/debito.service';
-import { ConsultaPedidoResponse } from '../../models/application/ConsultaPedido/ConsultaPedidoResponse';
 import * as moment from 'moment';
+
 import { getDigits } from '../../utils/stringUtils';
+import Veiculo from '../../models/domain/veiculo.model';
+import { ApiService } from '../api/api.service';
+
+import { VeiculoService, PedidoService, DebitoService } from '../domain';
+import {
+  ConsultaPlacaResponse,
+  ProcessaPagamentoRequest,
+  ProcessaPagamentoResponse,
+  ConsultaPedidoResponse,
+  ConsultaDebitoResponse,
+  ConsultaDebitoRequest,
+} from '../../models/application';
+import {
+  PNHConsultaDebitoRequest,
+  PNHProcessaPagamentoRequest,
+} from '../../models/api';
 
 @Injectable()
 export class BaseService {
@@ -26,6 +33,7 @@ export class BaseService {
   /**
    * Consulta o status de um pedido pelo número do pedido.
    * @param numeroPedido Número do pedido.
+   * @return Promise<ConsultaPedidoResponse>
    */
   async consultarPedido(numeroPedido: number): Promise<ConsultaPedidoResponse> {
     if (!numeroPedido || numeroPedido <= 0)
@@ -37,7 +45,7 @@ export class BaseService {
     const pedidoDb =
       await this.pedidoService.buscarPorNumeroPedido(numeroPedido);
 
-    if (pedidoDb && pedidoDb.status !== this.statusInicial) {
+    if (pedidoDb && pedidoDb.status !== apiResponse.data?.status) {
       const updatedData = { status: apiResponse.data.status };
       await this.pedidoService.update(pedidoDb.id, updatedData);
     }
@@ -49,7 +57,7 @@ export class BaseService {
    * Consulta informações de um veículo pela placa.
    * Verifica na base local e, caso não encontre, consulta na API externa.
    * @param placa Placa do veículo.
-   * @return ConsultaPlacaResponse resposta
+   * @return Promise<ConsultaPlacaResponse>
    */
   async consultarPlaca(placa: string): Promise<ConsultaPlacaResponse> {
     if (!placa || !placa.trim()) throw new HttpException('Placa inválida', 400);
@@ -67,7 +75,7 @@ export class BaseService {
     if (!apiResponse.resposta || !apiResponse.resposta.renavam)
       throw new HttpException('Erro na consulta de placa', 404);
 
-    const dbResult: Veiculo = await this.veiculoService.inserir({
+    const dbResult = await this.veiculoService.inserir({
       ...apiResponse.resposta,
       anoFabricacao: apiResponse.resposta.ano_fabricacao,
     });
@@ -78,6 +86,7 @@ export class BaseService {
   /**
    * Consulta débitos associados a um veículo pela placa.
    * @param data Dados para consulta de débitos.
+   * @return Promise<ConsultaDebitoResponse>
    */
   async consultaDebitos(
     data: ConsultaDebitoRequest,
@@ -114,6 +123,7 @@ export class BaseService {
       });
       return response;
     }
+
 
     const request = new PNHConsultaDebitoRequest();
     request.placa = data.placa.toLowerCase();
@@ -162,6 +172,49 @@ export class BaseService {
   }
 
   /**
+   * Processa o pagamento dos pedidos.
+   * @param data Dados para consulta de débitos.
+   * @type ProcessaPagamentoRequest
+   * @return Promise<PNHProcessaPagamentoRequest>
+   */
+  async processaPagamento(
+    data: ProcessaPagamentoRequest,
+  ): Promise<ProcessaPagamentoResponse> {
+    const request = new PNHProcessaPagamentoRequest();
+
+    request.cdFaturas = data.cdFaturas;
+    request.parcelas = data.parcelas.toString();
+    request.valorPagCartao = data.valorPagCartao.toFixed(1).replace('.', ',');
+    request.valorWynk = data.valorPagCartao.toFixed(1).replace('.', ',');
+    request.email = data.email;
+    request.celular = getDigits(data.telefone);
+    request.securityCode = data.securityCode.toString();
+    request.creditCardNumber = data.creditCardNumber;
+    request.monthYear = data.monthYear;
+    request.holderName = data.holderName;
+    request.cpfcnpj = getDigits(data.cpfcnpj);
+    request.telefone = getDigits(data.telefone);
+
+    try {
+      // Chama o serviço externo com o mapeamento realizado
+      const apiResult = await this.apiService.processaPagamento(request);
+
+      const consultaResponse = await this.consultarPedido(
+        apiResult.data.pedido,
+      );
+
+      apiResult.data.mensagem = consultaResponse.data.status;
+
+      return apiResult;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  //PRIVATES METHODS
+
+  /**
    * Verifica se uma consulta é antiga com base na data.
    * @param data Data da consulta.
    */
@@ -171,6 +224,12 @@ export class BaseService {
     return dataComparada !== hoje;
   }
 
+  /**
+   * Mapeia um obj do tipo veiculo para o tipo de resposta do serviço
+   * @param veiculo
+   * @type Veiculo
+   * @return ConsultaPlacaResponse
+   */
   private mapVeiculoToResponse(veiculo: Veiculo): ConsultaPlacaResponse {
     return {
       id: veiculo.id,

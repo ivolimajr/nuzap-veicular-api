@@ -4,11 +4,16 @@ import { Buffer } from 'buffer';
 import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import * as process from 'process';
-import { PNHConsultaPlacaResponse } from '../../models/api/consultaPlaca/PNHConsultaPlacaResponse';
-import { PNHConsultaDebitoRequest } from '../../models/api/consultaDebito/PNHConsultaDebitoRequest';
-import { PNHConsultaDebitoResponse } from '../../models/api/consultaDebito/PNHConsultaDebitoResponse';
-import { PNHConsultaPedidoResponse } from '../../models/api/consultaPedido/PNHConsultaPedidoResponse';
-import { PNHAutenticacaoResponse } from '../../models/api/autenticacao/PNHAutenticacaoResponse';
+import {
+  PNHConsultaPlacaResponse,
+  PNHProcessaPagamentoResponse,
+  PNHConsultaDebitoResponse,
+  PNHProcessaPagamentoRequest,
+  PNHConsultaDebitoRequest,
+  PNHConsultaPedidoResponse,
+  PNHAutenticacaoResponse,
+} from '../../models/api';
+import { PNHMockPagamentoResponse } from '../../mock/PNHMock';
 
 @Injectable()
 export class ApiService {
@@ -20,13 +25,23 @@ export class ApiService {
 
   constructor(private readonly httpService: HttpService) {}
 
+  /**
+   * Busca o token atual válido ou gera um novo token.
+   * @return String
+   * @example eyJhbGciOiJIUzI1NiIsInR5cCI.....
+   */
   async getToken(): Promise<string> {
-    if (this.token && this.tokenExpiresAt > Date.now()) {
-      return this.token;
-    }
+    if (this.token && this.tokenExpiresAt > Date.now()) return this.token;
+
     return await this.generateToken();
   }
 
+  /**
+   * Requisita na API da Parcele na Hora as informações de um veículo
+   * @param placa
+   * @type string
+   * @return Promise<PNHConsultaPlacaResponse>
+   */
   async consultarPlaca(placa: string): Promise<PNHConsultaPlacaResponse> {
     const token = await this.getToken();
     const url = `${this.baseUrl}/api/${this.apiVersion}/ConsultaPlaca`;
@@ -52,6 +67,12 @@ export class ApiService {
     }
   }
 
+  /**
+   * Requisita na API da Parcele na Hora a lista de todos os débitos de um veículo
+   * @param data
+   * @type PNHConsultaDebitoRequest
+   * @return Promise<PNHConsultaDebitoResponse>
+   */
   async consultaDebitos(
     data: PNHConsultaDebitoRequest,
   ): Promise<PNHConsultaDebitoResponse> {
@@ -76,6 +97,12 @@ export class ApiService {
     }
   }
 
+  /**
+   * Requisita na API da Parcele na Hora a lista o status de um pedido
+   * @param numeroPedido
+   * @type Number
+   * @return Promise<PNHConsultaPedidoResponse>
+   */
   async consultarStatusPedido(
     numeroPedido: number,
   ): Promise<PNHConsultaPedidoResponse> {
@@ -99,6 +126,36 @@ export class ApiService {
     }
   }
 
+  async processaPagamento(
+    data: PNHProcessaPagamentoRequest,
+  ): Promise<PNHProcessaPagamentoResponse> {
+    // return PNHMockPagamentoResponse as PNHProcessaPagamentoResponse;
+    const token = await this.getToken();
+    const url = `${this.baseUrl}/api/${this.apiVersion}/pagamento`;
+
+    try {
+      const response: AxiosResponse<PNHProcessaPagamentoResponse> =
+        await lastValueFrom(
+          this.httpService.post(url, data, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        );
+
+      return response.data;
+    } catch (error) {
+      throw new HttpException(
+        'Falha na consulta de débitos',
+        error.response?.status || 500,
+      );
+    }
+  }
+
+  /**
+   * Injeta nas pripriedades dessa classe o token e a validade do token
+   * @param token
+   * @type String
+   * @return void
+   */
   private setTokenProperties(token: string): void {
     if (token) {
       const decoded: any = JSON.parse(
@@ -112,6 +169,12 @@ export class ApiService {
     }
   }
 
+  /**
+   * Busca um token válido na API da Parcele na Hora e
+   * depois injeta o retorno as propriedades dessa classe
+   *
+   * @return Promise<string>
+   */
   private async generateToken(): Promise<string> {
     const url = `${this.baseUrl}/login/${this.apiAuthVersion}/login`;
     try {

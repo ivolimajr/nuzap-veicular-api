@@ -1,11 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, Length, Matches } from '@nestjs/class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches,
+} from '@nestjs/class-validator';
 
 export class ConsultaDebitoRequest {
   @IsNotEmpty({ message: 'A placa não pode estar vazio.' })
   @IsString({ message: 'A placa deve ser uma string.' })
   @Length(7, 8, { message: 'A placa deve ter entre 7 e 8 caracteres.' })
-  @ApiProperty({ description: 'Placa do veiculo', example: 'ABC1234' })
+  @ApiProperty({
+    description: 'Placa do veiculo',
+    example: 'ABC1234',
+    type: String,
+  })
   placa: string;
 
   @IsNotEmpty({ message: 'O e-mail não pode estar vazio.' })
@@ -15,6 +25,7 @@ export class ConsultaDebitoRequest {
   @ApiProperty({
     description: 'Email do cliente',
     example: 'joao.silva@example.com',
+    type: String,
   })
   email: string;
 
@@ -26,6 +37,7 @@ export class ConsultaDebitoRequest {
   @ApiProperty({
     description: 'Telefone celular do cliente',
     example: '11912345678',
+    type: String,
   })
   telefone: string;
 }

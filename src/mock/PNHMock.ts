@@ -85,6 +85,7 @@ export const PNHMockConsultaDebitoResponse = {
     ],
   },
 };
+
 export const PNHMockConsultarPedidoResponse = {
   success: true,
   message: 'Retorno Com Sucesso',
@@ -117,4 +118,15 @@ export const PNHMockConsultaPlacaError = {
     debitodireto: null,
     cpfCnpj: '',
   },
+};
+
+export const PNHMockPagamentoResponse = {
+  success: true,
+  message: 'Retorno Com Sucesso',
+  data: {
+    mensagem: 'Aguarde o processamento do pagamento',
+    pedido: 5654110,
+    transacao: 1373237,
+    transacaoWynk: 1373236
+  }
 };

@@ -16,12 +16,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BaseService } from '../services/application/base.service';
-import { ConsultaPlacaResponse } from '../models/application/ConsultaPlaca/ConsultaPlacaResponse';
+import { ConsultaPlacaResponse } from '../models/application/consultaPlaca/ConsultaPlacaResponse';
 import { ConsultaDebitoRequest } from '../models/application/consultaDebito/ConsultaDebitoRequest';
 import { ConsultaDebitoResponse } from '../models/application/consultaDebito/ConsultaDebitoResponse';
-import { ConsultaPedidoResponse } from '../models/application/ConsultaPedido/ConsultaPedidoResponse';
-import { ConsultaPedidoRequest } from '../models/application/ConsultaPedido/ConsultaPedidoRequest';
-import { ConsultaPlacaRequest } from '../models/application/ConsultaPlaca/ConsultaPlacaRequest';
+import { ConsultaPedidoResponse } from '../models/application/consultaPedido/ConsultaPedidoResponse';
+import { ConsultaPedidoRequest } from '../models/application/consultaPedido/ConsultaPedidoRequest';
+import { ConsultaPlacaRequest } from '../models/application/consultaPlaca/ConsultaPlacaRequest';
+import { ProcessaPagamentoRequest, ProcessaPagamentoResponse } from '../models/application';
 
 @ApiSecurity('x-api-key')
 @ApiTags('Veicular')
@@ -98,6 +99,28 @@ export class AppController {
   ): Promise<ConsultaDebitoResponse> {
     try {
       return await this.baseService.consultaDebitos(data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Consulta débitos associados a um veículo.
+   * @param data Dados para consulta de débitos (placa, email, telefone).
+   */
+  @ApiOperation({ summary: 'Consultar os débitos de um veículo pela placa' })
+  @ApiBody({ type: ProcessaPagamentoRequest })
+  @ApiResponse({
+    status: 200,
+    description: 'Informações do veículo retornadas com sucesso',
+    type: ProcessaPagamentoResponse,
+  })
+  @Post('processa-pagamento')
+  async processaPagamento(
+    @Body() data: ProcessaPagamentoRequest,
+  ): Promise<ProcessaPagamentoResponse> {
+    try {
+      return await this.baseService.processaPagamento(data);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }

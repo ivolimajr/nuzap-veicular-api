@@ -7,6 +7,7 @@ export class ConsultaPlacaRequest {
   @Length(7, 7, { message: 'A placa ter 7 caracteres.' })
   @ApiProperty({
     description: 'Numero da placa',
+    type: String,
     example: "ABC1D23",
   })
   placa: string;

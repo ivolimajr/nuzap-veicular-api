@@ -19,7 +19,10 @@ export class PedidoService {
     if (!pedido || pedido <= 0)
       throw new HttpException('Veiculo inválido', 400);
 
-    return await this.pedidoModel.findOne({ where: { pedido } });
+    return await this.pedidoModel.findOne({
+      where: { pedido },
+      attributes: ['id', 'status', 'pedido'],
+    });
   }
 
   /**
@@ -33,14 +36,14 @@ export class PedidoService {
 
     return await this.pedidoModel.findOne({
       where: { veiculoId: veiculoId },
-      order: [['created_at', 'DESC']],
-      attributes: ['veiculoId', 'pedido', 'mensagem', 'created_at'],
+      order: [['createdAt', 'DESC']],
+      attributes: ['veiculoId', 'pedido', 'mensagem', 'createdAt'],
       include: {
         model: Debito,
         as: 'debitos',
         attributes: [
           'id',
-          'cod_fatura',
+          'codFatura',
           'vencimento',
           'status_debito',
           'valor',

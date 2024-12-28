@@ -8,6 +8,7 @@ export class ConsultaPedidoRequest {
   @ApiProperty({
     description: 'Número do pedido',
     example: "5648753",
+    type: String
   })
   numeroPedido: string;
 }
