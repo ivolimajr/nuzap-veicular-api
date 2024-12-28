@@ -1,4 +1,4 @@
-export class PNHConsultaDebitosRequest {
+export class PNHConsultaDebitoRequest {
   cpf: string;
   uf: string;
   placa: string;

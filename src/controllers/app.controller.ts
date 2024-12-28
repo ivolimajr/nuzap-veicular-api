@@ -17,10 +17,11 @@ import {
 } from '@nestjs/swagger';
 import { BaseService } from '../services/application/base.service';
 import { ConsultaPlacaResponse } from '../models/application/ConsultaPlaca/ConsultaPlacaResponse';
-import { PNHConsultaDebitosRequest } from '../models/api/consultaDebito/PNHConsultaDebitosRequest';
 import { ConsultaDebitoRequest } from '../models/application/consultaDebito/ConsultaDebitoRequest';
 import { ConsultaDebitoResponse } from '../models/application/consultaDebito/ConsultaDebitoResponse';
 import { ConsultaPedidoResponse } from '../models/application/ConsultaPedido/ConsultaPedidoResponse';
+import { ConsultaPedidoRequest } from '../models/application/ConsultaPedido/ConsultaPedidoRequest';
+import { ConsultaPlacaRequest } from '../models/application/ConsultaPlaca/ConsultaPlacaRequest';
 
 @ApiSecurity('x-api-key')
 @ApiTags('Veicular')
@@ -30,7 +31,8 @@ export class AppController {
 
   /**
    * Consulta o status de um pedido pelo número.
-   * @param numeroPedido Número do pedido a ser consultado.
+   * @param params
+   * @type ConsultaPedidoRequest
    */
   @ApiOperation({ summary: 'Consultar o status de um pedido' })
   @ApiParam({
@@ -45,10 +47,12 @@ export class AppController {
   })
   @Get('consultar-pedido/:numeroPedido')
   async consultarPedido(
-    @Param('numeroPedido') numeroPedido: string,
+    @Param() params: ConsultaPedidoRequest,
   ): Promise<ConsultaPedidoResponse> {
     try {
-      return await this.baseService.consultarPedido(Number(numeroPedido));
+      return await this.baseService.consultarPedido(
+        Number(params.numeroPedido),
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -56,7 +60,8 @@ export class AppController {
 
   /**
    * Consulta as informações de um veículo pela placa.
-   * @param placa Placa do veículo.
+   * @param params
+   * @type ConsultaPlacaRequest
    */
   @ApiOperation({ summary: 'Consultar veículo pela placa' })
   @ApiParam({ name: 'placa', description: 'Placa do veículo', type: String })
@@ -67,10 +72,10 @@ export class AppController {
   })
   @Get('consultar-placa/:placa')
   async consultarPlaca(
-    @Param('placa') placa: string,
+    @Param() params: ConsultaPlacaRequest,
   ): Promise<ConsultaPlacaResponse> {
     try {
-      return await this.baseService.consultarPlaca(placa);
+      return await this.baseService.consultarPlaca(params.placa);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -88,7 +93,9 @@ export class AppController {
     type: ConsultaDebitoResponse,
   })
   @Post('consultar-debitos')
-  async consultarDebitos(@Body() data: PNHConsultaDebitosRequest) {
+  async consultarDebitos(
+    @Body() data: ConsultaDebitoRequest,
+  ): Promise<ConsultaDebitoResponse> {
     try {
       return await this.baseService.consultaDebitos(data);
     } catch (error) {

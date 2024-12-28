@@ -5,8 +5,8 @@ import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import * as process from 'process';
 import { PNHConsultaPlacaResponse } from '../../models/api/consultaPlaca/PNHConsultaPlacaResponse';
-import { PNHConsultaDebitosRequest } from '../../models/api/consultaDebito/PNHConsultaDebitosRequest';
-import { PNHConsultaDebitosResponse } from '../../models/api/consultaDebito/PNHConsultaDebitosResponse';
+import { PNHConsultaDebitoRequest } from '../../models/api/consultaDebito/PNHConsultaDebitoRequest';
+import { PNHConsultaDebitoResponse } from '../../models/api/consultaDebito/PNHConsultaDebitoResponse';
 import { PNHConsultaPedidoResponse } from '../../models/api/consultaPedido/PNHConsultaPedidoResponse';
 import { PNHAutenticacaoResponse } from '../../models/api/autenticacao/PNHAutenticacaoResponse';
 
@@ -53,14 +53,14 @@ export class ApiService {
   }
 
   async consultaDebitos(
-    data: PNHConsultaDebitosRequest,
-  ): Promise<PNHConsultaDebitosResponse> {
+    data: PNHConsultaDebitoRequest,
+  ): Promise<PNHConsultaDebitoResponse> {
     // return PNHMockConsultaDebitoResponse;
     const token = await this.getToken();
     const url = `${this.baseUrl}/api/${this.apiVersion}/ConsultaDebito`;
 
     try {
-      const response: AxiosResponse<PNHConsultaDebitosResponse> =
+      const response: AxiosResponse<PNHConsultaDebitoResponse> =
         await lastValueFrom(
           this.httpService.post(url, data, {
             headers: { Authorization: `Bearer ${token}` },

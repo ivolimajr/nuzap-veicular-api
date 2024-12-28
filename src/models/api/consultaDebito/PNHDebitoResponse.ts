@@ -1,4 +1,4 @@
-export interface PNHDebitosResponse {
+export interface PNHDebitoResponse {
   codFatura: number;
   codDebito: number;
   codNsu: string;

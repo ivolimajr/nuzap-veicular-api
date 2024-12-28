@@ -3,7 +3,7 @@ import { ApiService } from '../api/api.service';
 import { VeiculoService } from '../domain/veiculo.service';
 import { ConsultaPlacaResponse } from '../../models/application/ConsultaPlaca/ConsultaPlacaResponse';
 import Veiculo from '../../models/domain/veiculo.model';
-import { PNHConsultaDebitosRequest } from '../../models/api/consultaDebito/PNHConsultaDebitosRequest';
+import { PNHConsultaDebitoRequest } from '../../models/api/consultaDebito/PNHConsultaDebitoRequest';
 import { PedidoService } from '../domain/pedido.service';
 import { ConsultaDebitoRequest } from '../../models/application/consultaDebito/ConsultaDebitoRequest';
 import { ConsultaDebitoResponse } from '../../models/application/consultaDebito/ConsultaDebitoResponse';
@@ -115,7 +115,7 @@ export class BaseService {
       return response;
     }
 
-    const request = new PNHConsultaDebitosRequest();
+    const request = new PNHConsultaDebitoRequest();
     request.placa = data.placa.toLowerCase();
     request.cpf = veiculoDb.cpfCnpj;
     request.uf = veiculoDb.uf;
