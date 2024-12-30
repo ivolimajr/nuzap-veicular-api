@@ -13,7 +13,6 @@ export class DebitoService {
     try {
       return await this.debitoModel.create(data);
     } catch (error) {
-      console.log(error);
       throw new HttpException('Erro ao criar veículo', 500);
     }
   }
@@ -22,7 +21,6 @@ export class DebitoService {
     try {
       return await this.debitoModel.bulkCreate(data, { returning: true });
     } catch (error) {
-      console.log(error);
       throw new HttpException('Erro ao criar débitos', 500);
     }
   }

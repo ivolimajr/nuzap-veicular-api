@@ -35,7 +35,6 @@ export class VeiculoService {
       data.placa = data.placa.toLowerCase();
       return await this.veiculoModel.create(data);
     } catch (error) {
-      console.log(error);
       throw new HttpException('Erro ao criar veículo', 500);
     }
   }

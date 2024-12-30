@@ -62,7 +62,6 @@ export class PedidoService {
     try {
       return await this.pedidoModel.create(data);
     } catch (error) {
-      console.log(error);
       throw new HttpException('Erro ao criar veículo', 500);
     }
   }
@@ -74,7 +73,6 @@ export class PedidoService {
     try {
       return await pedido.update(data);
     } catch (error) {
-      console.error(error);
       throw new HttpException('Erro ao atualizar o pedido', 500);
     }
   }

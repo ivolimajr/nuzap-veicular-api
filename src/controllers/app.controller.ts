@@ -22,7 +22,10 @@ import { ConsultaDebitoResponse } from '../models/application/consultaDebito/Con
 import { ConsultaPedidoResponse } from '../models/application/consultaPedido/ConsultaPedidoResponse';
 import { ConsultaPedidoRequest } from '../models/application/consultaPedido/ConsultaPedidoRequest';
 import { ConsultaPlacaRequest } from '../models/application/consultaPlaca/ConsultaPlacaRequest';
-import { ProcessaPagamentoRequest, ProcessaPagamentoResponse } from '../models/application';
+import {
+  ProcessaPagamentoRequest,
+  ProcessaPagamentoResponse,
+} from '../models/application';
 
 @ApiSecurity('x-api-key')
 @ApiTags('Veicular')
@@ -55,7 +58,7 @@ export class AppController {
         Number(params.numeroPedido),
       );
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw error
     }
   }
 
@@ -78,7 +81,7 @@ export class AppController {
     try {
       return await this.baseService.consultarPlaca(params.placa);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw error
     }
   }
 
@@ -100,7 +103,7 @@ export class AppController {
     try {
       return await this.baseService.consultaDebitos(data);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw error
     }
   }
 
@@ -122,7 +125,7 @@ export class AppController {
     try {
       return await this.baseService.processaPagamento(data);
     } catch (error) {
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw error
     }
   }
 }

@@ -14,6 +14,7 @@ import {
   PNHAutenticacaoResponse,
 } from '../../models/api';
 import { PNHMockPagamentoResponse } from '../../mock/PNHMock';
+import { CustomException } from '../../middleares/CustomException';
 
 @Injectable()
 export class ApiService {
@@ -59,10 +60,11 @@ export class ApiService {
         );
       return response.data;
     } catch (error) {
-      console.log(error);
-      throw new HttpException(
-        'Falha na consulta de placa',
+      throw new CustomException(
+        error.message,
         error.response?.status || 500,
+        'Falha na consulta de placa',
+        error.response?.data,
       );
     }
   }
@@ -90,9 +92,11 @@ export class ApiService {
 
       return response.data;
     } catch (error) {
-      throw new HttpException(
-        'Falha na consulta de débitos',
+      throw new CustomException(
+        error.message,
         error.response?.status || 500,
+        'Falha na consulta de débitos',
+        error.response?.data,
       );
     }
   }
@@ -119,9 +123,11 @@ export class ApiService {
 
       return response.data;
     } catch (error) {
-      throw new HttpException(
-        'Falha na consulta de status do pedido',
+      throw new CustomException(
+        error.message,
         error.response?.status || 500,
+        'Falha na consulta de status do pedido',
+        error.response?.data,
       );
     }
   }
@@ -143,9 +149,11 @@ export class ApiService {
 
       return response.data;
     } catch (error) {
-      throw new HttpException(
-        'Falha na consulta de débitos',
+      throw new CustomException(
+        error.message,
         error.response?.status || 500,
+        'Falha ao processar pagamento',
+        error.response?.data,
       );
     }
   }

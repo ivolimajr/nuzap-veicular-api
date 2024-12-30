@@ -39,18 +39,22 @@ export class BaseService {
     if (!numeroPedido || numeroPedido <= 0)
       throw new HttpException('Número do pedido inválido', 400);
 
-    const apiResponse =
-      await this.apiService.consultarStatusPedido(numeroPedido);
+    try {
+      const apiResponse =
+        await this.apiService.consultarStatusPedido(numeroPedido);
 
-    const pedidoDb =
-      await this.pedidoService.buscarPorNumeroPedido(numeroPedido);
+      const pedidoDb =
+        await this.pedidoService.buscarPorNumeroPedido(numeroPedido);
 
-    if (pedidoDb && pedidoDb.status !== apiResponse.data?.status) {
-      const updatedData = { status: apiResponse.data.status };
-      await this.pedidoService.update(pedidoDb.id, updatedData);
+      if (pedidoDb && pedidoDb.status !== apiResponse.data?.status) {
+        const updatedData = { status: apiResponse.data.status };
+        await this.pedidoService.update(pedidoDb.id, updatedData);
+      }
+
+      return apiResponse as ConsultaPedidoResponse;
+    } catch (e) {
+      throw e;
     }
-
-    return apiResponse as ConsultaPedidoResponse;
   }
 
   /**
@@ -64,23 +68,27 @@ export class BaseService {
 
     placa = placa.toLowerCase();
 
-    const veiculo = await this.veiculoService.buscarPorPlaca(placa);
+    try {
+      const veiculo = await this.veiculoService.buscarPorPlaca(placa);
 
-    if (veiculo) {
-      console.log('Veiculo vindo do banco');
-      return this.mapVeiculoToResponse(veiculo);
+      if (veiculo) {
+        console.log('Veiculo vindo do banco');
+        return this.mapVeiculoToResponse(veiculo);
+      }
+
+      const apiResponse = await this.apiService.consultarPlaca(placa);
+      if (!apiResponse.resposta || !apiResponse.resposta.renavam)
+        throw new HttpException('Erro na consulta de placa', 404);
+
+      const dbResult = await this.veiculoService.inserir({
+        ...apiResponse.resposta,
+        anoFabricacao: apiResponse.resposta.ano_fabricacao,
+      });
+
+      return this.mapVeiculoToResponse(dbResult);
+    } catch (e) {
+      throw e;
     }
-
-    const apiResponse = await this.apiService.consultarPlaca(placa);
-    if (!apiResponse.resposta || !apiResponse.resposta.renavam)
-      throw new HttpException('Erro na consulta de placa', 404);
-
-    const dbResult = await this.veiculoService.inserir({
-      ...apiResponse.resposta,
-      anoFabricacao: apiResponse.resposta.ano_fabricacao,
-    });
-
-    return this.mapVeiculoToResponse(dbResult);
   }
 
   /**
@@ -95,80 +103,84 @@ export class BaseService {
 
     const veiculoDb = await this.consultarPlaca(data.placa);
 
-    const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculoDb.id);
+    try {
+      const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculoDb.id);
 
-    let response: ConsultaDebitoResponse = new ConsultaDebitoResponse();
+      let response: ConsultaDebitoResponse = new ConsultaDebitoResponse();
 
-    //se vier uma resposta do banco de dados e for válida, retorna os débitos da base
-    if (
-      pedidoDb &&
-      !this.isConsultaAntiga(pedidoDb.createdAt) &&
-      pedidoDb.debitos.length > 0
-    ) {
-      console.log('Debitos vindo do banco');
-      response = {
-        pedido: pedidoDb.pedido,
-        status: pedidoDb.status,
-        mensagem: pedidoDb.mensagem,
-        debitos: [],
-      };
-      pedidoDb.debitos.forEach((element) => {
-        response.debitos.push({
-          vencimento: moment(element.vencimento).format('DD/MM/YYYY'),
-          status_debito: element.statusDebito,
-          cod_fatura: element.codFatura,
-          descricao: element.descricao,
-          valor: element.valor.toString(),
+      //se vier uma resposta do banco de dados e for válida, retorna os débitos da base
+      if (
+        pedidoDb &&
+        !this.isConsultaAntiga(pedidoDb.createdAt) &&
+        pedidoDb.debitos.length > 0
+      ) {
+        console.log('Debitos vindo do banco');
+        response = {
+          pedido: pedidoDb.pedido,
+          status: pedidoDb.status,
+          mensagem: pedidoDb.mensagem,
+          debitos: [],
+        };
+        pedidoDb.debitos.forEach((element) => {
+          response.debitos.push({
+            vencimento: moment(element.vencimento).format('DD/MM/YYYY'),
+            status_debito: element.statusDebito,
+            cod_fatura: element.codFatura,
+            descricao: element.descricao,
+            valor: element.valor.toString(),
+          });
         });
-      });
-      return response;
-    }
+        return response;
+      }
 
+      const request = new PNHConsultaDebitoRequest();
+      request.placa = data.placa.toLowerCase();
+      request.cpf = veiculoDb.cpfCnpj;
+      request.uf = veiculoDb.uf;
+      request.email = data.email;
+      request.telefone = data.telefone;
+      request.renavam = veiculoDb.renavam;
+      request.chassi = veiculoDb.chassi;
 
-    const request = new PNHConsultaDebitoRequest();
-    request.placa = data.placa.toLowerCase();
-    request.cpf = veiculoDb.cpfCnpj;
-    request.uf = veiculoDb.uf;
-    request.email = data.email;
-    request.telefone = data.telefone;
-    request.renavam = veiculoDb.renavam;
-    request.chassi = veiculoDb.chassi;
+      const apiResult = await this.apiService.consultaDebitos(request);
 
-    const apiResult = await this.apiService.consultaDebitos(request);
-
-    if (!apiResult.success)
-      throw new HttpException(
-        apiResult.message || 'Erro na consulta de débitos',
-        400,
-      );
-
-    const newPedidoDb = await this.pedidoService.create({
-      veiculoId: veiculoDb.id,
-      mensagem: apiResult.message,
-      status: this.statusInicial,
-      pedido: apiResult.data.pedido,
-    });
-
-    let debitos = [];
-    if (apiResult.data.debitos?.length > 0) {
-      apiResult.data.debitos.map((item) => {
-        const vencimento = moment(item.vencimento, 'M/D/YYYY h:mm:ss A').format(
-          'YYYY-MM-DD HH:mm:ss',
+      if (!apiResult.success)
+        throw new HttpException(
+          apiResult.message || 'Erro na consulta de débitos',
+          400,
         );
-        debitos.push({
-          ...item,
-          vencimento,
-          pedidoId: newPedidoDb.id,
-        });
+
+      const newPedidoDb = await this.pedidoService.create({
+        veiculoId: veiculoDb.id,
+        mensagem: apiResult.message,
+        status: this.statusInicial,
+        pedido: apiResult.data.pedido,
       });
-      debitos = await this.debitoService.createAll(debitos);
+
+      let debitos = [];
+      if (apiResult.data.debitos?.length > 0) {
+        apiResult.data.debitos.map((item) => {
+          const vencimento = moment(
+            item.vencimento,
+            'M/D/YYYY h:mm:ss A',
+          ).format('YYYY-MM-DD HH:mm:ss');
+          debitos.push({
+            ...item,
+            vencimento,
+            pedidoId: newPedidoDb.id,
+          });
+        });
+        debitos = await this.debitoService.createAll(debitos);
+      }
+
+      response.pedido = apiResult.data.pedido;
+      response.mensagem = apiResult.data.mensagem;
+      response.debitos = debitos;
+
+      return response;
+    } catch (e) {
+      throw e;
     }
-
-    response.pedido = apiResult.data.pedido;
-    response.mensagem = apiResult.data.mensagem;
-    response.debitos = debitos;
-
-    return response;
   }
 
   /**
@@ -202,12 +214,10 @@ export class BaseService {
       const consultaResponse = await this.consultarPedido(
         apiResult.data.pedido,
       );
-
       apiResult.data.mensagem = consultaResponse.data.status;
 
       return apiResult;
     } catch (error) {
-      console.log(error);
       throw error;
     }
   }
