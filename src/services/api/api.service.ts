@@ -20,9 +20,9 @@ import { CustomException } from '../../middleares/CustomException';
 export class ApiService {
   private token: string = null;
   private tokenExpiresAt: number = 0;
-  private baseUrl: string = process.env.EPS_BASE_URL;
-  private apiVersion: string = process.env.EPS_API_VERSION;
-  private apiAuthVersion: string = process.env.EPS_API_AUTH_VERSION;
+  private baseUrl: string = process.env.PNH_BASE_URL;
+  private apiVersion: string = process.env.PNH_API_VERSION;
+  private apiAuthVersion: string = process.env.PNH_API_AUTH_VERSION;
 
   constructor(private readonly httpService: HttpService) {}
 
@@ -189,8 +189,8 @@ export class ApiService {
       const response: AxiosResponse<PNHAutenticacaoResponse> =
         await lastValueFrom(
           this.httpService.post(url, {
-            email: process.env.EPS_CLIENT_ID,
-            senha: process.env.EPS_CLIENT_SECRET,
+            email: process.env.PNH_CLIENT_ID,
+            senha: process.env.PNH_CLIENT_SECRET,
           }),
         );
       const token = response.data.token;
