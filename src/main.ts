@@ -22,7 +22,7 @@ async function bootstrap() {
   SwaggerModule.setup('/', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
-
+  console.info(`App in running on port: ${process.env.PORT}`)
   await app.listen(process.env.PORT);
 }
 
