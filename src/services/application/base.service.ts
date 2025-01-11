@@ -174,7 +174,7 @@ export class BaseService {
       }
 
       response.pedido = apiResult.data.pedido;
-      response.mensagem = apiResult.data.mensagem;
+      response.mensagem = apiResult.message || apiResult.data.mensagem;
       response.debitos = debitos;
 
       return response;

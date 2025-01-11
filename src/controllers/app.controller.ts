@@ -1,9 +1,7 @@
 import {
   Body,
   Controller,
-  Get,
-  HttpException,
-  HttpStatus,
+  Get, HttpCode,
   Param,
   Post,
 } from '@nestjs/common';
@@ -16,10 +14,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BaseService } from '../services/application/base.service';
-import { ConsultaPlacaResponse } from '../models/application/consultaPlaca/ConsultaPlacaResponse';
-import { ConsultaDebitoRequest } from '../models/application/consultaDebito/ConsultaDebitoRequest';
-import { ConsultaDebitoResponse } from '../models/application/consultaDebito/ConsultaDebitoResponse';
-import { ConsultaPedidoResponse } from '../models/application/consultaPedido/ConsultaPedidoResponse';
+import {
+  ConsultaDebitoRequest,
+  ConsultaDebitoResponse,
+  ConsultaPedidoResponse,
+  ConsultaPlacaResponse,
+} from '../models/application';
 import { ConsultaPedidoRequest } from '../models/application/consultaPedido/ConsultaPedidoRequest';
 import { ConsultaPlacaRequest } from '../models/application/consultaPlaca/ConsultaPlacaRequest';
 import {
@@ -50,6 +50,7 @@ export class AppController {
     type: ConsultaPedidoResponse,
   })
   @Get('consultar-pedido/:numeroPedido')
+  @HttpCode(200)
   async consultarPedido(
     @Param() params: ConsultaPedidoRequest,
   ): Promise<ConsultaPedidoResponse> {
@@ -75,6 +76,7 @@ export class AppController {
     type: ConsultaPlacaResponse,
   })
   @Get('consultar-placa/:placa')
+  @HttpCode(200)
   async consultarPlaca(
     @Param() params: ConsultaPlacaRequest,
   ): Promise<ConsultaPlacaResponse> {
@@ -97,6 +99,7 @@ export class AppController {
     type: ConsultaDebitoResponse,
   })
   @Post('consultar-debitos')
+  @HttpCode(200)
   async consultarDebitos(
     @Body() data: ConsultaDebitoRequest,
   ): Promise<ConsultaDebitoResponse> {
@@ -119,6 +122,7 @@ export class AppController {
     type: ProcessaPagamentoResponse,
   })
   @Post('processa-pagamento')
+  @HttpCode(200)
   async processaPagamento(
     @Body() data: ProcessaPagamentoRequest,
   ): Promise<ProcessaPagamentoResponse> {
