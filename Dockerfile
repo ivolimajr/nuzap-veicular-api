@@ -18,12 +18,19 @@ RUN npm run build
 FROM node:22-alpine
 WORKDIR /app
 
+# Instala tzdata para configurar o timezone
+RUN apk add --no-cache tzdata
+
+# Configura o timezone para America/Sao_Paulo
+ENV TZ=America/Sao_Paulo
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Copia apenas os artefatos necessários da etapa de construção
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
 # Copia o arquivo .env para o contêiner apenas para teste local
-# COPY .env ./
+COPY .env ./
 
 # Exposição da porta
 EXPOSE 8080
