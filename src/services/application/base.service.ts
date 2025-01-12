@@ -47,10 +47,10 @@ export class BaseService {
       const pedidoDb =
         await this.pedidoService.buscarPorNumeroPedido(numeroPedido);
 
-      console.info(
-        `current status: ${pedidoDb.status} | new status: ${apiResponse.data.status}`,
-      );
       if (pedidoDb && pedidoDb.status !== apiResponse.data?.status) {
+        console.info(
+          `current status: ${pedidoDb.status} | new status: ${apiResponse.data.status}`,
+        );
         const updatedData = { status: apiResponse.data.status };
         await this.pedidoService.update(pedidoDb.id, updatedData);
       }
@@ -64,7 +64,9 @@ export class BaseService {
   /**
    * Consulta informações de um veículo pela placa.
    * Verifica na base local e, caso não encontre, consulta na API externa.
-   * @param placa Placa do veículo.
+   * @param placa Placa do veículo.console.info(
+   *           `current status: ${pedidoDb.status} | new status: ${apiResponse.data.status}`,
+   *         );
    * @return Promise<ConsultaPlacaResponse>
    */
   async consultarPlaca(placa: string): Promise<ConsultaPlacaResponse> {

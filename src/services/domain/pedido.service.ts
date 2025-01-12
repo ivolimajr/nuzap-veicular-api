@@ -17,7 +17,7 @@ export class PedidoService {
    */
   async buscarPorNumeroPedido(pedido: number): Promise<Pedido | null> {
     if (!pedido || pedido <= 0)
-      throw new HttpException('Veiculo inválido', 400);
+      throw new HttpException('Pedido inválido', 400);
 
     return await this.pedidoModel.findOne({
       where: { pedido },
