@@ -37,7 +37,7 @@ export class PedidoService {
     return await this.pedidoModel.findOne({
       where: { veiculoId: veiculoId },
       order: [['createdAt', 'DESC']],
-      attributes: ['veiculoId', 'pedido', 'mensagem', 'createdAt'],
+      attributes: ['veiculoId', 'pedido', 'mensagem', 'createdAt','status'],
       include: {
         model: Debito,
         as: 'debitos',
