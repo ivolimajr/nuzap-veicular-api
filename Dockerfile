@@ -30,7 +30,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 
 # Copia o arquivo .env para o contêiner apenas para teste local
-COPY .env ./
+# COPY .env ./
 
 # Exposição da porta
 EXPOSE 8080
