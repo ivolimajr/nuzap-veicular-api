@@ -16,6 +16,7 @@ export class Veiculo extends Model<Veiculo> {
   @Column({
     type: DataType.STRING(10),
     allowNull: false,
+    unique: true,
   })
   placa!: string;
 
@@ -61,13 +62,14 @@ export class Veiculo extends Model<Veiculo> {
   @Column({
     type: DataType.DATE,
     defaultValue: DataType.NOW,
-    field: 'created_at', // Alinha com o nome da coluna no banco
+    field: 'created_at',
   })
   createdAt: Date;
 
   @Column({
     type: DataType.DATE,
-    field: 'updated_at', // Alinha com o nome da coluna no banco
+    defaultValue: DataType.NOW,
+    field: 'updated_at',
   })
   updatedAt!: Date;
 }

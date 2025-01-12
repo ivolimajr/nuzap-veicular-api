@@ -8,7 +8,13 @@ export class DebitoResponse {
     description: 'Data de vencimento do débito',
     example: '2024-12-23T06:00:00.000Z',
   })
-  vencimento: string;
+  vencimento: Date;
+
+  @ApiProperty({
+    description: 'Data de vencimento do débito formatado no padrão DD/MM/YYYY',
+    example: '31/12/2024',
+  })
+  vencimento_formatado: string;
 
   @ApiProperty({
     description: 'Status do débito junto ao orgão',

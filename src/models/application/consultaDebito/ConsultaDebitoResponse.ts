@@ -20,6 +20,7 @@ export class ConsultaDebitoResponse {
       {
         cod_fatura: 16662630,
         vencimento: '2024-12-23T06:00:00.000Z',
+        vencimento_formatado: '31/12/2024',
         status_debito: 'Em aberto',
         valor: '62.82',
         descricao: 'Licenciamento 2024',

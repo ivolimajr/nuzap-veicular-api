@@ -51,7 +51,7 @@ export class Debito extends Model<Debito> {
   statusDebito!: string;
 
   @Column({
-    type: DataType.TEXT,
+    type: DataType.STRING(150),
     allowNull: true,
   })
   descricao!: string;

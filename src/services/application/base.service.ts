@@ -1,23 +1,24 @@
-import { Injectable, HttpException } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 
 import { getDigits } from '../../utils/stringUtils';
 import Veiculo from '../../models/domain/veiculo.model';
 import { ApiService } from '../api/api.service';
 
-import { VeiculoService, PedidoService, DebitoService } from '../domain';
+import { DebitoService, PedidoService, VeiculoService } from '../domain';
 import {
+  ConsultaDebitoRequest,
+  ConsultaDebitoResponse,
+  ConsultaPedidoResponse,
   ConsultaPlacaResponse,
   ProcessaPagamentoRequest,
   ProcessaPagamentoResponse,
-  ConsultaPedidoResponse,
-  ConsultaDebitoResponse,
-  ConsultaDebitoRequest,
 } from '../../models/application';
 import {
   PNHConsultaDebitoRequest,
   PNHProcessaPagamentoRequest,
 } from '../../models/api';
+import { Debito } from '../../models/domain/debito.model';
 
 @Injectable()
 export class BaseService {
@@ -46,7 +47,9 @@ export class BaseService {
       const pedidoDb =
         await this.pedidoService.buscarPorNumeroPedido(numeroPedido);
 
-      console.info(`current status: ${pedidoDb.status} | new status: ${apiResponse.data.status}`);
+      console.info(
+        `current status: ${pedidoDb.status} | new status: ${apiResponse.data.status}`,
+      );
       if (pedidoDb && pedidoDb.status !== apiResponse.data?.status) {
         const updatedData = { status: apiResponse.data.status };
         await this.pedidoService.update(pedidoDb.id, updatedData);
@@ -124,7 +127,10 @@ export class BaseService {
         };
         pedidoDb.debitos.forEach((element) => {
           response.debitos.push({
-            vencimento: moment(element.vencimento).format('DD/MM/YYYY'),
+            vencimento: element.vencimento,
+            vencimento_formatado: moment(element.vencimento).format(
+              'DD/MM/YYYY',
+            ),
             status_debito: element.statusDebito,
             cod_fatura: element.codFatura,
             descricao: element.descricao,
@@ -158,25 +164,35 @@ export class BaseService {
         pedido: apiResult.data.pedido,
       });
 
-      let debitos = [];
+      let debitos: any[] = [];
+      let debitosCriados: Debito[] = [];
       if (apiResult.data.debitos?.length > 0) {
         apiResult.data.debitos.map((item) => {
           const vencimento = moment(
             item.vencimento,
             'M/D/YYYY h:mm:ss A',
-          ).format('YYYY-MM-DD HH:mm:ss');
+          ).toDate();
           debitos.push({
             ...item,
             vencimento,
             pedidoId: newPedidoDb.id,
           });
         });
-        debitos = await this.debitoService.createAll(debitos);
+        debitosCriados = await this.debitoService.createAll(debitos);
       }
 
       response.pedido = apiResult.data.pedido;
       response.mensagem = apiResult.message || apiResult.data.mensagem;
-      response.debitos = debitos;
+      response.debitos = debitosCriados.map((item:Debito) => {
+        return {
+          vencimento: item.vencimento,
+          status_debito: item.statusDebito,
+          vencimento_formatado: moment(item.vencimento).format('DD/MM/YYYY'),
+          cod_fatura: item.codFatura,
+          descricao: item.descricao,
+          valor: item.valor.toString(),
+        };
+      });
 
       return response;
     } catch (e) {

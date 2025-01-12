@@ -13,7 +13,7 @@ import {
   PNHConsultaPedidoResponse,
   PNHAutenticacaoResponse,
 } from '../../models/api';
-import { PNHMockPagamentoResponse } from '../../mock/PNHMock';
+import { PNHMockConsultaDebitoResponse, PNHMockPagamentoResponse } from '../../mock/PNHMock';
 import { CustomException } from '../../middleares/CustomException';
 
 @Injectable()

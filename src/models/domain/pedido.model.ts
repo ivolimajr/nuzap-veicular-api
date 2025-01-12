@@ -39,7 +39,7 @@ export class Pedido extends Model<Pedido> {
   pedido: number;
 
   @Column({
-    type: DataType.TEXT,
+    type: DataType.STRING(150),
     allowNull: false,
     field: 'mensagem',
   })
