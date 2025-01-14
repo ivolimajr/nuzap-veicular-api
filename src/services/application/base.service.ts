@@ -117,6 +117,7 @@ export class BaseService {
       //se vier uma resposta do banco de dados e for válida, retorna os débitos da base
       if (
         pedidoDb &&
+        pedidoDb.status.toLowerCase() === this.statusInicial.toLowerCase() &&
         !this.isConsultaAntiga(pedidoDb.createdAt) &&
         pedidoDb.debitos.length > 0
       ) {
@@ -184,6 +185,7 @@ export class BaseService {
       }
 
       response.pedido = apiResult.data.pedido;
+      response.status = this.statusInicial;
       response.mensagem = apiResult.message || apiResult.data.mensagem;
       response.debitos = debitosCriados.map((item:Debito) => {
         return {
