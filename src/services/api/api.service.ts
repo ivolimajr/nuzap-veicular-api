@@ -56,7 +56,7 @@ export class ApiService {
             {
               headers: { Authorization: `Bearer ${token}` },
             },
-          ),
+          )
         );
       return response.data;
     } catch (error) {

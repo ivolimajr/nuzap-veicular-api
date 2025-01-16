@@ -19,6 +19,7 @@ import {
   PNHProcessaPagamentoRequest,
 } from '../../models/api';
 import { Debito } from '../../models/domain/debito.model';
+import { CustomException } from '../../middleares/CustomException';
 
 @Injectable()
 export class BaseService {
@@ -83,8 +84,16 @@ export class BaseService {
       }
 
       const apiResponse = await this.apiService.consultarPlaca(placa);
-      if (!apiResponse.resposta || !apiResponse.resposta.renavam)
-        throw new HttpException('Erro na consulta de placa', 404);
+      if (!apiResponse.resposta || !apiResponse.resposta.renavam) {
+        if (apiResponse.solitacao?.mensagem)
+          throw new CustomException(
+            apiResponse.solitacao.mensagem,
+            404,
+            'Veículo não encontrado',
+            apiResponse,
+          );
+        throw new HttpException('Falha ao consultar placa', 404);
+      }
 
       const dbResult = await this.veiculoService.inserir({
         ...apiResponse.resposta,
@@ -187,7 +196,7 @@ export class BaseService {
       response.pedido = apiResult.data.pedido;
       response.status = this.statusInicial;
       response.mensagem = apiResult.message || apiResult.data.mensagem;
-      response.debitos = debitosCriados.map((item:Debito) => {
+      response.debitos = debitosCriados.map((item: Debito) => {
         return {
           vencimento: item.vencimento,
           status_debito: item.statusDebito,
