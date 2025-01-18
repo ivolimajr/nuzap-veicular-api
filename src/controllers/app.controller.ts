@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get, HttpCode,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
@@ -59,7 +53,7 @@ export class AppController {
         Number(params.numeroPedido),
       );
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -70,20 +64,29 @@ export class AppController {
    */
   @ApiOperation({ summary: 'Consultar veículo pela placa' })
   @ApiParam({ name: 'placa', description: 'Placa do veículo', type: String })
+  @ApiParam({
+    name: 'renavam',
+    description: 'Renavam do veículo',
+    type: String,
+    required: false,
+  })
   @ApiResponse({
     status: 200,
     description: 'Informações do veículo retornadas com sucesso',
     type: ConsultaPlacaResponse,
   })
-  @Get('consultar-placa/:placa')
+  @Get('consultar-placa/:placa/:renavam?')
   @HttpCode(200)
   async consultarPlaca(
     @Param() params: ConsultaPlacaRequest,
   ): Promise<ConsultaPlacaResponse> {
     try {
-      return await this.baseService.consultarPlaca(params.placa);
+      return await this.baseService.consultarPlaca(
+        params.placa,
+        params.renavam || null,
+      );
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -106,7 +109,7 @@ export class AppController {
     try {
       return await this.baseService.consultaDebitos(data);
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
@@ -129,7 +132,7 @@ export class AppController {
     try {
       return await this.baseService.processaPagamento(data);
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }

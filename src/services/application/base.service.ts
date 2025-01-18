@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 
-import { getDigits } from '../../utils/stringUtils';
+import { exists, getDigits } from '../../utils/stringUtils';
 import Veiculo from '../../models/domain/veiculo.model';
 import { ApiService } from '../api/api.service';
 
@@ -68,9 +68,13 @@ export class BaseService {
    * @param placa Placa do veículo.console.info(
    *           `current status: ${pedidoDb.status} | new status: ${apiResponse.data.status}`,
    *         );
+   * @param renavam Opcional
    * @return Promise<ConsultaPlacaResponse>
    */
-  async consultarPlaca(placa: string): Promise<ConsultaPlacaResponse> {
+  async consultarPlaca(
+    placa: string,
+    renavam: string = null,
+  ): Promise<ConsultaPlacaResponse> {
     if (!placa || !placa.trim()) throw new HttpException('Placa inválida', 400);
 
     placa = placa.toLowerCase();
@@ -84,7 +88,10 @@ export class BaseService {
       }
 
       const apiResponse = await this.apiService.consultarPlaca(placa);
-      if (!apiResponse.resposta || !apiResponse.resposta.renavam) {
+      if (
+        !apiResponse.resposta ||
+        exists(apiResponse.solitacao?.mensagem, 'Erro')
+      ) {
         if (apiResponse.solitacao?.mensagem)
           throw new CustomException(
             apiResponse.solitacao.mensagem,
@@ -95,10 +102,21 @@ export class BaseService {
         throw new HttpException('Falha ao consultar placa', 404);
       }
 
-      const dbResult = await this.veiculoService.inserir({
+      if (!renavam && !apiResponse.resposta.renavam)
+        throw new CustomException(
+          'Informe o renavam',
+          400,
+          'Informe o renavam',
+          apiResponse.resposta,
+        );
+
+      const _veiculo = {
         ...apiResponse.resposta,
+        renavam: renavam || apiResponse.resposta.renavam,
         anoFabricacao: apiResponse.resposta.ano_fabricacao,
-      });
+      };
+
+      const dbResult = await this.veiculoService.inserir(_veiculo);
 
       return this.mapVeiculoToResponse(dbResult);
     } catch (e) {
@@ -116,7 +134,7 @@ export class BaseService {
   ): Promise<ConsultaDebitoResponse> {
     data.telefone = getDigits(data.telefone);
 
-    const veiculoDb = await this.consultarPlaca(data.placa);
+    const veiculoDb = await this.consultarPlaca(data.placa, data.renavam);
 
     try {
       const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculoDb.id);
@@ -131,6 +149,13 @@ export class BaseService {
         pedidoDb.debitos.length > 0
       ) {
         console.log('Debitos vindo do banco');
+        if (!veiculoDb.renavam)
+          throw new CustomException(
+            'Informe o renavam',
+            400,
+            'Informe o renavam',
+            veiculoDb,
+          );
         response = {
           pedido: pedidoDb.pedido,
           status: pedidoDb.status,

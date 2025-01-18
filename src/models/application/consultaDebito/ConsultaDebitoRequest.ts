@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Length,
   Matches,
@@ -17,6 +18,15 @@ export class ConsultaDebitoRequest {
     type: String,
   })
   placa: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Renavam do veiculo',
+    example: '01094850567',
+    type: String,
+    required: false,
+  })
+  renavam: string;
 
   @IsNotEmpty({ message: 'O e-mail não pode estar vazio.' })
   @IsString({ message: 'E-mail deve ser uma string.' })
