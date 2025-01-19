@@ -73,7 +73,7 @@ export class BaseService {
   async consultarPlaca(placa: string): Promise<ConsultaPlacaResponse> {
     if (!placa || !placa.trim()) throw new HttpException('Placa inválida', 400);
 
-    placa = placa.toLowerCase();
+    placa = placa.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
 
     try {
       const veiculo = await this.veiculoService.buscarPorPlaca(placa);
@@ -115,6 +115,7 @@ export class BaseService {
     data: ConsultaDebitoRequest,
   ): Promise<ConsultaDebitoResponse> {
     data.telefone = getDigits(data.telefone);
+    data.placa = data.placa.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
 
     const veiculoDb = await this.consultarPlaca(data.placa);
 

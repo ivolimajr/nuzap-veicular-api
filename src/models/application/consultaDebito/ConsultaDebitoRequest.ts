@@ -10,7 +10,7 @@ import {
 export class ConsultaDebitoRequest {
   @IsNotEmpty({ message: 'A placa não pode estar vazio.' })
   @IsString({ message: 'A placa deve ser uma string.' })
-  @Length(7, 8, { message: 'A placa deve ter entre 7 e 8 caracteres.' })
+  @Length(7, 9, { message: 'A placa deve ter entre 7 e 9 caracteres.' })
   @ApiProperty({
     description: 'Placa do veiculo',
     example: 'ABC1234',
