@@ -13,8 +13,12 @@ import {
   PNHConsultaPedidoResponse,
   PNHAutenticacaoResponse,
 } from '../../models/api';
-import { PNHMockConsultaDebitoResponse, PNHMockPagamentoResponse } from '../../mock/PNHMock';
+import {
+  PNHMockConsultaDebitoResponse,
+  PNHMockPagamentoResponse,
+} from '../../mock/PNHMock';
 import { CustomException } from '../../middleares/CustomException';
+import { exists } from '../../utils/stringUtils';
 
 @Injectable()
 export class ApiService {
@@ -56,7 +60,7 @@ export class ApiService {
             {
               headers: { Authorization: `Bearer ${token}` },
             },
-          )
+          ),
         );
       return response.data;
     } catch (error) {
@@ -92,10 +96,23 @@ export class ApiService {
 
       return response.data;
     } catch (error) {
+      let userMessage = 'Falha na consulta de débitos';
+      if (error.response.data) {
+        if (
+          error.response.data.message &&
+          exists(error.response.data.message, 'Detran está indisponível')
+        ) {
+          userMessage =
+            'O sistema do Detran está indisponível, tente novamente mais tarde !';
+
+          error.message =
+            'O sistema do Detran está indisponível, tente novamente mais tarde !';
+        }
+      }
       throw new CustomException(
         error.message,
         error.response?.status || 500,
-        'Falha na consulta de débitos',
+        userMessage,
         error.response?.data,
       );
     }
