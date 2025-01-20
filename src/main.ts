@@ -3,10 +3,25 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as process from 'process';
 import { ValidationPipe } from '@nestjs/common';
+import * as cors from 'cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        const corsOrigins = process.env.CORS_ORIGINS?.split(',') || [];
+        if (!origin || corsOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      methods: 'GET',
+      credentials: true,
+    }),
+  );
   // Configuração básica do Swagger
   const config = new DocumentBuilder()
     .setTitle('API NuZap')
@@ -22,7 +37,7 @@ async function bootstrap() {
   SwaggerModule.setup('/', app, document);
 
   app.useGlobalPipes(new ValidationPipe());
-  console.info(`App in running on port: ${process.env.PORT}`)
+  console.info(`App in running on port: ${process.env.PORT}`);
   await app.listen(process.env.PORT);
 }
 
