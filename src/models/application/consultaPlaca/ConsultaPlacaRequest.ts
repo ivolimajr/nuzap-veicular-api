@@ -9,7 +9,7 @@ import {
 export class ConsultaPlacaRequest {
   @IsNotEmpty({ message: 'O numero da placa não pode estar vazio.' })
   @IsString({ message: 'A placa deve ser uma string.' })
-  @Length(7, 7, { message: 'A placa ter 7 caracteres.' })
+  @Length(7, 9, { message: 'A placa ter entre 7 a 9 caracteres.' })
   @ApiProperty({
     description: 'Numero da placa',
     type: String,
