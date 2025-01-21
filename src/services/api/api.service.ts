@@ -27,6 +27,8 @@ export class ApiService {
   private baseUrl: string = process.env.PNH_BASE_URL;
   private apiVersion: string = process.env.PNH_API_VERSION;
   private apiAuthVersion: string = process.env.PNH_API_AUTH_VERSION;
+  private email: string = process.env.PNH_CLIENT_ID
+  private password: string = process.env.PNH_CLIENT_SECRET
 
   constructor(private readonly httpService: HttpService) {}
 
@@ -206,8 +208,8 @@ export class ApiService {
       const response: AxiosResponse<PNHAutenticacaoResponse> =
         await lastValueFrom(
           this.httpService.post(url, {
-            email: process.env.PNH_CLIENT_ID,
-            senha: process.env.PNH_CLIENT_SECRET,
+            email: this.email,
+            senha: this.password,
           }),
         );
       const token = response.data.token;

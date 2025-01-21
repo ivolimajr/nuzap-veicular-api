@@ -78,7 +78,7 @@ export class BaseService {
     if (!placa || !placa.trim()) throw new CustomException('Placa inválida', 400,"Verifique a placa informada", placa);
 
     placa = placa.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
-    renavam = renavam ? getDigits(renavam) : null;
+    renavam = renavam ? renavam.trim() : null;
 
     try {
       const veiculo = await this.veiculoService.buscarPorPlaca(placa);
@@ -102,6 +102,14 @@ export class BaseService {
           );
         throw new CustomException('Falha ao consultar placa', 404, "Tente realizar a consulta em outro momento.");
       }
+
+      if(
+        !apiResponse.resposta.chassi &&
+        !apiResponse.resposta.uf &&
+        !apiResponse.resposta.marcaModelo &&
+        !apiResponse.resposta.cpfCnpj
+      )
+        throw new CustomException('Informações do veículos insuficientes', 404, "Não tivemos informações suficientes sobre o veiculo",apiResponse);
 
       const _veiculo = {
         ...apiResponse.resposta,
@@ -127,7 +135,7 @@ export class BaseService {
   ): Promise<ConsultaDebitoResponse> {
     data.telefone = getDigits(data.telefone);
     data.placa = data.placa.trim().replace(/[^A-Za-z0-9]/g, '').toLowerCase();
-    data.renavam = data.renavam ? getDigits(data.renavam) : null;
+    data.renavam = data.renavam ? data.renavam.trim() : null;
 
     const veiculo = await this.consultarPlaca(data.placa, data.renavam);
 

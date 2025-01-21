@@ -4,6 +4,7 @@
  * @type string
  * @return String
  * @example (11) 91234-5678 -> 11912345678
+ * @example '000000123' -> '123
  */
 export function getDigits(input: string): string {
   if (!input || typeof input !== "string") return input;
