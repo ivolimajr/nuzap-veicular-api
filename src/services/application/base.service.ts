@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as moment from 'moment';
 
 import { exists, getDigits } from '../../utils/stringUtils';
@@ -39,7 +39,7 @@ export class BaseService {
    */
   async consultarPedido(numeroPedido: number): Promise<ConsultaPedidoResponse> {
     if (!numeroPedido || numeroPedido <= 0)
-      throw new HttpException('Número do pedido inválido', 400);
+      throw new CustomException('Número do pedido inválido', 400,"Informe o número do pedido corretamente",numeroPedido);
 
     try {
       const apiResponse =
@@ -75,9 +75,10 @@ export class BaseService {
     placa: string,
     renavam: string = null,
   ): Promise<ConsultaPlacaResponse> {
-    if (!placa || !placa.trim()) throw new HttpException('Placa inválida', 400);
+    if (!placa || !placa.trim()) throw new CustomException('Placa inválida', 400,"Verifique a placa informada", placa);
 
     placa = placa.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    renavam = renavam ? getDigits(renavam) : null;
 
     try {
       const veiculo = await this.veiculoService.buscarPorPlaca(placa);
@@ -90,29 +91,21 @@ export class BaseService {
       const apiResponse = await this.apiService.consultarPlaca(placa);
       if (
         !apiResponse.resposta ||
-        exists(apiResponse.solitacao?.mensagem, 'Erro')
+        exists(apiResponse.solicitacao?.mensagem, 'Erro')
       ) {
-        if (apiResponse.solitacao?.mensagem)
+        if (apiResponse.solicitacao?.mensagem)
           throw new CustomException(
-            apiResponse.solitacao.mensagem,
+            apiResponse.solicitacao.mensagem,
             404,
             'Veículo não encontrado',
             apiResponse,
           );
-        throw new HttpException('Falha ao consultar placa', 404);
+        throw new CustomException('Falha ao consultar placa', 404, "Tente realizar a consulta em outro momento.");
       }
-
-      if (!renavam && !apiResponse.resposta.renavam)
-        throw new CustomException(
-          'Informe o renavam',
-          400,
-          'Informe o renavam',
-          apiResponse.resposta,
-        );
 
       const _veiculo = {
         ...apiResponse.resposta,
-        renavam: renavam || apiResponse.resposta.renavam,
+        renavam: apiResponse.resposta.renavam || renavam,
         anoFabricacao: apiResponse.resposta.ano_fabricacao,
       };
 
@@ -133,12 +126,21 @@ export class BaseService {
     data: ConsultaDebitoRequest,
   ): Promise<ConsultaDebitoResponse> {
     data.telefone = getDigits(data.telefone);
-    data.placa = data.placa.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    data.placa = data.placa.trim().replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    data.renavam = data.renavam ? getDigits(data.renavam) : null;
 
-    const veiculoDb = await this.consultarPlaca(data.placa, data.renavam);
+    const veiculo = await this.consultarPlaca(data.placa, data.renavam);
+
+    if (veiculo != null && !veiculo.renavam && !data.renavam)
+      throw new CustomException(
+        'Informe o renavam para esse veículo',
+        400,
+        'O renavam é necessário',
+        veiculo,
+      );
 
     try {
-      const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculoDb.id);
+      const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculo.id);
 
       let response: ConsultaDebitoResponse = new ConsultaDebitoResponse();
 
@@ -149,20 +151,14 @@ export class BaseService {
         !this.isConsultaAntiga(pedidoDb.createdAt) &&
         pedidoDb.debitos.length > 0
       ) {
-        console.log('Debitos vindo do banco');
-        if (!veiculoDb.renavam)
-          throw new CustomException(
-            'Informe o renavam',
-            400,
-            'Informe o renavam',
-            veiculoDb,
-          );
+
         response = {
           pedido: pedidoDb.pedido,
           status: pedidoDb.status,
           mensagem: pedidoDb.mensagem,
           debitos: [],
         };
+
         pedidoDb.debitos.forEach((element) => {
           response.debitos.push({
             vencimento: element.vencimento,
@@ -180,23 +176,20 @@ export class BaseService {
 
       const request = new PNHConsultaDebitoRequest();
       request.placa = data.placa.toLowerCase();
-      request.cpf = veiculoDb.cpfCnpj;
-      request.uf = veiculoDb.uf;
+      request.cpf = veiculo.cpfCnpj;
+      request.uf = veiculo.uf;
       request.email = data.email;
       request.telefone = data.telefone;
-      request.renavam = veiculoDb.renavam;
-      request.chassi = veiculoDb.chassi;
+      request.renavam = veiculo.renavam || data.renavam;
+      request.chassi = veiculo.chassi;
 
       const apiResult = await this.apiService.consultaDebitos(request);
 
       if (!apiResult.success)
-        throw new HttpException(
-          apiResult.message || 'Erro na consulta de débitos',
-          400,
-        );
+        throw new CustomException(apiResult.message, 400,"Favor, tente novamente mais tarde",apiResult)
 
       const newPedidoDb = await this.pedidoService.create({
-        veiculoId: veiculoDb.id,
+        veiculoId: veiculo.id,
         mensagem: apiResult.message,
         status: this.statusInicial,
         pedido: apiResult.data.pedido,
@@ -279,7 +272,6 @@ export class BaseService {
   }
 
   //PRIVATES METHODS
-
   /**
    * Verifica se uma consulta é antiga com base na data.
    * @param data Data da consulta.

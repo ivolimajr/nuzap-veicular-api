@@ -1,5 +1,5 @@
 export interface PNHConsultaPlacaResponse {
-  solitacao: Solicitacao;
+  solicitacao: Solicitacao;
   resposta: Resposta;
 }
 
