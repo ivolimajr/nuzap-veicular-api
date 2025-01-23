@@ -25,32 +25,32 @@ import { CustomException } from '../../middleares/CustomException';
 export class BaseService {
   private readonly statusInicial: string = 'Consulta';
   private readonly requisitosPorUF: Record<string, string[]> = {
-    DF: ['Renavam'],
-    MG: ['Renavam'],
-    GO: ['Renavam'],
-    AC: ['Renavam', 'CPF'],
-    AL: ['Renavam'],
-    AM: ['Renavam'],
-    AP: ['Renavam'],
-    BA: ['Renavam'],
-    ES: ['Renavam'],
-    MS: ['Renavam'],
-    MA: ['Renavam', 'CPF'],
-    MT: ['Renavam', 'Chassi'],
-    PB: ['Renavam'],
-    PE: ['Renavam', 'CPF'],
-    PI: ['Renavam', 'CPF'],
-    RN: ['Renavam'],
-    RR: ['Renavam'],
-    TO: ['Renavam', 'CPF'],
-    RO: ['Renavam'],
-    RS: ['Renavam', 'CPF'],
-    SC: ['Renavam', 'CPF'],
-    CE: ['Renavam', 'CPF'],
-    SP: ['Renavam'],
-    RJ: ['Renavam', 'CPF'],
-    PR: ['Renavam', 'CPF'],
-    PA: ['Renavam', 'CPF'],
+    DF: ['renavam'],
+    MG: ['renavam'],
+    GO: ['renavam'],
+    AC: ['renavam', 'cpfCnpj'],
+    AL: ['renavam'],
+    AM: ['renavam'],
+    AP: ['renavam'],
+    BA: ['renavam'],
+    ES: ['renavam'],
+    MS: ['renavam'],
+    MA: ['renavam', 'cpfCnpj'],
+    MT: ['renavam', 'Chassi'],
+    PB: ['renavam'],
+    PE: ['renavam', 'cpfCnpj'],
+    PI: ['renavam', 'cpfCnpj'],
+    RN: ['renavam'],
+    RR: ['renavam'],
+    TO: ['renavam', 'cpfCnpj'],
+    RO: ['renavam'],
+    RS: ['renavam', 'cpfCnpj'],
+    SC: ['renavam', 'cpfCnpj'],
+    CE: ['renavam', 'cpfCnpj'],
+    SP: ['renavam'],
+    RJ: ['renavam', 'cpfCnpj'],
+    PR: ['renavam', 'cpfCnpj'],
+    PA: ['renavam', 'cpfCnpj'],
   };
 
   constructor(
@@ -171,7 +171,7 @@ export class BaseService {
         ...apiResponse.resposta,
         renavam: apiResponse.resposta.renavam || renavam,
         chassi: apiResponse.resposta.chassi || chassi,
-        documento: apiResponse.resposta.cpfCnpj || documento,
+        cpfCnpj: apiResponse.resposta.cpfCnpj || documento,
         anoFabricacao: apiResponse.resposta.ano_fabricacao,
       };
 
@@ -208,7 +208,7 @@ export class BaseService {
     );
 
     // Valida os requisitos para a UF do veículo
-    // this.validarRequisitosPorUF(veiculo.uf, veiculo, data);
+    this.validarRequisitosPorUF(veiculo.uf, veiculo, data);
 
     try {
       const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculo.id);
@@ -378,7 +378,7 @@ export class BaseService {
     };
   }
 
-  private validarRequisitosPorUF(uf: string, veiculo: any, data: any): void {
+  private validarRequisitosPorUF(uf: string, veiculo: ConsultaPlacaResponse, data: any): void {
     const requisitos = this.requisitosPorUF[uf];
 
     if (!requisitos) {
@@ -391,10 +391,9 @@ export class BaseService {
 
     // Verifica cada requisito
     requisitos.forEach((campo) => {
-      const valorVeiculo = veiculo[campo.toLowerCase()]; // Veículo (ex: veiculo.renavam)
-      const valorData = data[campo.toLowerCase()]; // Requisição (ex: data.renavam)
+      const valorVeiculo = veiculo[campo];
 
-      if (!valorVeiculo && !valorData) {
+      if (!valorVeiculo) {
         throw new CustomException(
           `Informe o ${campo} para esta UF (${uf})`,
           400,
