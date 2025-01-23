@@ -208,7 +208,7 @@ export class BaseService {
     );
 
     // Valida os requisitos para a UF do veículo
-    this.validarRequisitosPorUF(veiculo.uf, veiculo, data);
+    // this.validarRequisitosPorUF(veiculo.uf, veiculo, data);
 
     try {
       const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculo.id);
