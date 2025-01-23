@@ -39,4 +39,10 @@ export class ConsultaPlacaResponse {
     example: '12345678901',
   })
   cpfCnpj: string;
+
+  @ApiProperty({
+    description: 'Lista com os dados pendentes na consulta',
+    example: '["placa","renavam"]',
+  })
+  pendentes: string[];
 }

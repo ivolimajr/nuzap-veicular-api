@@ -12,7 +12,7 @@ import { VeiculoAppService } from '../../veiculo/service/veiculo-app.service';
 import { PedidoService } from '../../../domain/pedido/service/pedido.service';
 import { DebitoService } from '../../../domain/debito/service/debito.service';
 import { ConsultaDebitoRequest, ConsultaDebitoResponse } from '../models';
-import { RequisitosPorUF } from '../utils/const';
+import { RequisitosPorUF } from '../../../../utils/const';
 import { ConsultaPlacaResponse } from '../../veiculo/models';
 
 @Injectable()

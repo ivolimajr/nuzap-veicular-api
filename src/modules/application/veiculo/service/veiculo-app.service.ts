@@ -6,9 +6,12 @@ import Veiculo from '../../../domain/veiculo/models/veiculo.model';
 import { PNHConsultaPlacaResponse } from '../../../integration/models';
 import { VeiculoService } from '../../../domain/veiculo/service/veiculo.service';
 import { ConsultaPlacaResponse } from '../models';
+import { RequisitosPorUF } from '../../../../utils/const';
 
 @Injectable()
 export class VeiculoAppService {
+
+  private readonly requisitosPorUF: Record<string, string[]> = RequisitosPorUF;
 
   constructor(
     private readonly apiService: PnhApiService,
@@ -115,7 +118,7 @@ export class VeiculoAppService {
    * @type Veiculo
    * @return ConsultaPlacaResponse
    */
-  private mapVeiculoToResponse(veiculo: Veiculo): ConsultaPlacaResponse {
+  private mapVeiculoToResponse(veiculo: Veiculo) {
     return {
       id: veiculo.id,
       placa: veiculo.placa,
@@ -127,6 +130,21 @@ export class VeiculoAppService {
       anoModelo: veiculo.anoModelo,
       uf: veiculo.uf,
       cpfCnpj: veiculo.cpfCnpj,
+      pendentes: this.verificarPendencias(veiculo)
     };
+  }
+
+  private verificarPendencias(veiculo: Veiculo): string[] {
+    const requisitos = this.requisitosPorUF[veiculo.uf.toUpperCase()] || [];
+    const pendentes: string[] = [];
+
+    requisitos.forEach((campo) => {
+      const valor = veiculo[campo];
+      if (!valor || valor.trim() === "") {
+        pendentes.push(campo);
+      }
+    });
+
+    return pendentes;
   }
 }
