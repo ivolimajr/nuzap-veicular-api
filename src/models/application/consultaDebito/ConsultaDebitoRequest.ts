@@ -50,4 +50,22 @@ export class ConsultaDebitoRequest {
     type: String,
   })
   telefone: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Chassi do veiculo',
+    example: '8AGSU19F0DR13798A',
+    type: String,
+    required: false,
+  })
+  chassi: string;
+
+  @IsOptional()
+  @ApiProperty({
+    description: 'Documento do proprietário do veiculo',
+    example: '12345678909',
+    type: String,
+    required: false,
+  })
+  cpfCnpj: string;
 }

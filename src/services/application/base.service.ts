@@ -23,7 +23,35 @@ import { CustomException } from '../../middleares/CustomException';
 
 @Injectable()
 export class BaseService {
-  private statusInicial: string = 'Consulta';
+  private readonly statusInicial: string = 'Consulta';
+  private readonly requisitosPorUF: Record<string, string[]> = {
+    DF: ['Renavam'],
+    MG: ['Renavam'],
+    GO: ['Renavam'],
+    AC: ['Renavam', 'CPF'],
+    AL: ['Renavam'],
+    AM: ['Renavam'],
+    AP: ['Renavam'],
+    BA: ['Renavam'],
+    ES: ['Renavam'],
+    MS: ['Renavam'],
+    MA: ['Renavam', 'CPF'],
+    MT: ['Renavam', 'Chassi'],
+    PB: ['Renavam'],
+    PE: ['Renavam', 'CPF'],
+    PI: ['Renavam', 'CPF'],
+    RN: ['Renavam'],
+    RR: ['Renavam'],
+    TO: ['Renavam', 'CPF'],
+    RO: ['Renavam'],
+    RS: ['Renavam', 'CPF'],
+    SC: ['Renavam', 'CPF'],
+    CE: ['Renavam', 'CPF'],
+    SP: ['Renavam'],
+    RJ: ['Renavam', 'CPF'],
+    PR: ['Renavam', 'CPF'],
+    PA: ['Renavam', 'CPF'],
+  };
 
   constructor(
     private readonly apiService: ApiService,
@@ -39,7 +67,12 @@ export class BaseService {
    */
   async consultarPedido(numeroPedido: number): Promise<ConsultaPedidoResponse> {
     if (!numeroPedido || numeroPedido <= 0)
-      throw new CustomException('Número do pedido inválido', 400,"Informe o número do pedido corretamente",numeroPedido);
+      throw new CustomException(
+        'Número do pedido inválido',
+        400,
+        'Informe o número do pedido corretamente',
+        numeroPedido,
+      );
 
     try {
       const apiResponse =
@@ -69,16 +102,28 @@ export class BaseService {
    *           `current status: ${pedidoDb.status} | new status: ${apiResponse.data.status}`,
    *         );
    * @param renavam Opcional
+   * @param chassi Opcional
+   * @param documento Opcional
    * @return Promise<ConsultaPlacaResponse>
    */
   async consultarPlaca(
     placa: string,
     renavam: string = null,
+    chassi: string = null,
+    documento: string = null,
   ): Promise<ConsultaPlacaResponse> {
-    if (!placa || !placa.trim()) throw new CustomException('Placa inválida', 400,"Verifique a placa informada", placa);
+    if (!placa || !placa.trim())
+      throw new CustomException(
+        'Placa inválida',
+        400,
+        'Verifique a placa informada',
+        placa,
+      );
 
     placa = placa.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
     renavam = renavam ? renavam.trim() : null;
+    chassi = chassi ? chassi.trim() : null;
+    documento = documento ? getDigits(documento) : null;
 
     try {
       const veiculo = await this.veiculoService.buscarPorPlaca(placa);
@@ -89,6 +134,7 @@ export class BaseService {
       }
 
       const apiResponse = await this.apiService.consultarPlaca(placa);
+
       if (
         !apiResponse.resposta ||
         exists(apiResponse.solicitacao?.mensagem, 'Erro')
@@ -100,20 +146,32 @@ export class BaseService {
             'Veículo não encontrado',
             apiResponse,
           );
-        throw new CustomException('Falha ao consultar placa', 404, "Tente realizar a consulta em outro momento.");
+        throw new CustomException(
+          'Falha ao consultar placa',
+          404,
+          'Tente realizar a consulta em outro momento.',
+        );
       }
 
-      if(
+      //Caso não venha nenhum dado da API, retorna que o veiculo não foi encontrado
+      if (
         !apiResponse.resposta.chassi &&
         !apiResponse.resposta.uf &&
         !apiResponse.resposta.marcaModelo &&
         !apiResponse.resposta.cpfCnpj
       )
-        throw new CustomException('Informações do veículos insuficientes', 404, "Não tivemos informações suficientes sobre o veiculo",apiResponse);
+        throw new CustomException(
+          'Informações do veículos insuficientes',
+          404,
+          'Não tivemos informações suficientes sobre o veiculo',
+          apiResponse,
+        );
 
       const _veiculo = {
         ...apiResponse.resposta,
         renavam: apiResponse.resposta.renavam || renavam,
+        chassi: apiResponse.resposta.chassi || chassi,
+        documento: apiResponse.resposta.cpfCnpj || documento,
         anoFabricacao: apiResponse.resposta.ano_fabricacao,
       };
 
@@ -134,18 +192,23 @@ export class BaseService {
     data: ConsultaDebitoRequest,
   ): Promise<ConsultaDebitoResponse> {
     data.telefone = getDigits(data.telefone);
-    data.placa = data.placa.trim().replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+    data.placa = data.placa
+      .trim()
+      .replace(/[^A-Za-z0-9]/g, '')
+      .toLowerCase();
     data.renavam = data.renavam ? data.renavam.trim() : null;
+    data.chassi = data.chassi ? data.chassi.trim() : null;
+    data.cpfCnpj = data.cpfCnpj ? getDigits(data.cpfCnpj) : null;
 
-    const veiculo = await this.consultarPlaca(data.placa, data.renavam);
+    const veiculo = await this.consultarPlaca(
+      data.placa,
+      data.renavam,
+      data.chassi,
+      data.cpfCnpj,
+    );
 
-    if (veiculo != null && !veiculo.renavam && !data.renavam)
-      throw new CustomException(
-        'Informe o renavam para esse veículo',
-        400,
-        'O renavam é necessário',
-        veiculo,
-      );
+    // Valida os requisitos para a UF do veículo
+    this.validarRequisitosPorUF(veiculo.uf, veiculo, data);
 
     try {
       const pedidoDb = await this.pedidoService.buscarPorVeiculo(veiculo.id);
@@ -159,7 +222,6 @@ export class BaseService {
         !this.isConsultaAntiga(pedidoDb.createdAt) &&
         pedidoDb.debitos.length > 0
       ) {
-
         response = {
           pedido: pedidoDb.pedido,
           status: pedidoDb.status,
@@ -183,18 +245,23 @@ export class BaseService {
       }
 
       const request = new PNHConsultaDebitoRequest();
-      request.placa = data.placa.toLowerCase();
-      request.cpf = veiculo.cpfCnpj;
+      request.placa = data.placa.toLowerCase() || request.placa;
+      request.cpf = veiculo.cpfCnpj || data.cpfCnpj;
       request.uf = veiculo.uf;
       request.email = data.email;
       request.telefone = data.telefone;
       request.renavam = veiculo.renavam || data.renavam;
-      request.chassi = veiculo.chassi;
+      request.chassi = veiculo.chassi || data.chassi;
 
       const apiResult = await this.apiService.consultaDebitos(request);
 
       if (!apiResult.success)
-        throw new CustomException(apiResult.message, 400,"Favor, tente novamente mais tarde",apiResult)
+        throw new CustomException(
+          apiResult.message,
+          400,
+          'Favor, tente novamente mais tarde',
+          apiResult,
+        );
 
       const newPedidoDb = await this.pedidoService.create({
         veiculoId: veiculo.id,
@@ -309,5 +376,32 @@ export class BaseService {
       uf: veiculo.uf,
       cpfCnpj: veiculo.cpfCnpj,
     };
+  }
+
+  private validarRequisitosPorUF(uf: string, veiculo: any, data: any): void {
+    const requisitos = this.requisitosPorUF[uf];
+
+    if (!requisitos) {
+      throw new CustomException(
+        `UF não suportada: ${uf}`,
+        400,
+        'Validação de UF falhou',
+      );
+    }
+
+    // Verifica cada requisito
+    requisitos.forEach((campo) => {
+      const valorVeiculo = veiculo[campo.toLowerCase()]; // Veículo (ex: veiculo.renavam)
+      const valorData = data[campo.toLowerCase()]; // Requisição (ex: data.renavam)
+
+      if (!valorVeiculo && !valorData) {
+        throw new CustomException(
+          `Informe o ${campo} para esta UF (${uf})`,
+          400,
+          `O campo ${campo} é necessário para realizar a consulta`,
+          data,
+        );
+      }
+    });
   }
 }
