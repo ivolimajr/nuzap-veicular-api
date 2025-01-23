@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { ConsultaPlacaResponse } from '../../../../models/application';
 import { CustomException } from '../../../../middleares/CustomException';
 import { exists, getDigits } from '../../../../utils/stringUtils';
-import { ApiService } from '../../../../services/api/api.service';
-import {
-  VeiculoService,
-} from '../../../../services/domain';
-import Veiculo from '../../../../models/domain/veiculo.model';
+import { PnhApiService } from '../../../integration/pnh-api.service';
+import Veiculo from '../../../domain/veiculo/models/veiculo.model';
+import { PNHConsultaPlacaResponse } from '../../../integration/models';
+import { VeiculoService } from '../../../domain/veiculo/service/veiculo.service';
+import { ConsultaPlacaResponse } from '../models';
 
 @Injectable()
 export class VeiculoAppService {
 
   constructor(
-    private readonly apiService: ApiService,
+    private readonly apiService: PnhApiService,
     private readonly veiculoService: VeiculoService,
   ) {}
 
@@ -56,43 +55,13 @@ export class VeiculoAppService {
 
       const apiResponse = await this.apiService.consultarPlaca(placa);
 
-      if (
-        !apiResponse.resposta ||
-        exists(apiResponse.solicitacao?.mensagem, 'Erro')
-      ) {
-        if (apiResponse.solicitacao?.mensagem)
-          throw new CustomException(
-            apiResponse.solicitacao.mensagem,
-            404,
-            'Veículo não encontrado',
-            apiResponse,
-          );
-        throw new CustomException(
-          'Falha ao consultar placa',
-          404,
-          'Tente realizar a consulta em outro momento.',
-        );
-      }
-
-      //Caso não venha nenhum dado da API, retorna que o veiculo não foi encontrado
-      if (
-        !apiResponse.resposta.chassi &&
-        !apiResponse.resposta.uf &&
-        !apiResponse.resposta.marcaModelo &&
-        !apiResponse.resposta.cpfCnpj
-      )
-        throw new CustomException(
-          'Informações do veículos insuficientes',
-          404,
-          'Não tivemos informações suficientes sobre o veiculo',
-          apiResponse,
-        );
+      this.valididateApiResponse(apiResponse);
 
       const _veiculo = {
         ...apiResponse.resposta,
         renavam: apiResponse.resposta.renavam || renavam,
         chassi: apiResponse.resposta.chassi || chassi,
-        documento: apiResponse.resposta.cpfCnpj || documento,
+        cpfCnpj: apiResponse.resposta.cpfCnpj || documento,
         anoFabricacao: apiResponse.resposta.ano_fabricacao,
       };
 
@@ -105,7 +74,43 @@ export class VeiculoAppService {
   }
 
   /**
-   * Mapeia um obj do tipo veiculo para o tipo de resposta do serviço
+   * Caso não venha nenhum dado da API, retorna que o service não foi encontrado
+   */
+  private valididateApiResponse(apiResponse: PNHConsultaPlacaResponse): void{
+    if (
+      !apiResponse.resposta ||
+      exists(apiResponse.solicitacao?.mensagem, 'Erro')
+    ) {
+      if (apiResponse.solicitacao?.mensagem)
+        throw new CustomException(
+          apiResponse.solicitacao.mensagem,
+          404,
+          'Veículo não encontrado',
+          apiResponse,
+        );
+      throw new CustomException(
+        'Falha ao consultar placa',
+        404,
+        'Tente realizar a consulta em outro momento.',
+      );
+    }
+
+    if (
+      !apiResponse.resposta.chassi &&
+      !apiResponse.resposta.uf &&
+      !apiResponse.resposta.marcaModelo &&
+      !apiResponse.resposta.cpfCnpj
+    )
+      throw new CustomException(
+        'Informações do veículos insuficientes',
+        404,
+        'Não tivemos informações suficientes sobre o service',
+        apiResponse,
+      );
+  }
+
+  /**
+   * Mapeia um obj do tipo service para o tipo de resposta do serviço
    * @param veiculo
    * @type Veiculo
    * @return ConsultaPlacaResponse

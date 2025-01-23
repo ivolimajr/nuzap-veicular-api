@@ -7,28 +7,24 @@ import {
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
-import { BaseService } from '../services/application/base.service';
-import {
-  ConsultaDebitoRequest,
-  ConsultaDebitoResponse,
-  ConsultaPedidoResponse,
-  ConsultaPlacaResponse,
-} from '../models/application';
-import { ConsultaPedidoRequest } from '../models/application/consultaPedido/ConsultaPedidoRequest';
-import { ConsultaPlacaRequest } from '../models/application/consultaPlaca/ConsultaPlacaRequest';
-import {
-  ProcessaPagamentoRequest,
-  ProcessaPagamentoResponse,
-} from '../models/application';
+import { ConsultaPedidoRequest, ConsultaPedidoResponse } from '../modules/application/pedido/models';
 import { VeiculoAppService } from '../modules/application/veiculo/service/veiculo-app.service';
+import { DebitoAppService } from '../modules/application/debito/service/debito-app.service';
+import { PedidoAppService } from '../modules/application/pedido/service/pedido-app.service';
+import { PagamentoAppService } from '../modules/application/pagamento/service/pagamento-app.service';
+import { ConsultaPlacaRequest, ConsultaPlacaResponse } from '../modules/application/veiculo/models';
+import { ConsultaDebitoRequest, ConsultaDebitoResponse } from '../modules/application/debito/models';
+import { ProcessaPagamentoRequest, ProcessaPagamentoResponse } from '../modules/application/pagamento/models';
 
 @ApiSecurity('x-api-key')
 @ApiTags('Veicular')
 @Controller('veiculo')
 export class AppController {
   constructor(
-    private readonly baseService: BaseService,
-    private readonly veiculoService: VeiculoAppService
+    private readonly veiculoService: VeiculoAppService,
+    private readonly pedidoService: PedidoAppService,
+    private readonly debitoService: DebitoAppService,
+    private readonly pagamentoService: PagamentoAppService
   ) {}
 
   /**
@@ -53,7 +49,7 @@ export class AppController {
     @Param() params: ConsultaPedidoRequest,
   ): Promise<ConsultaPedidoResponse> {
     try {
-      return await this.baseService.consultarPedido(
+      return await this.pedidoService.consultarPedido(
         Number(params.numeroPedido),
       );
     } catch (error) {
@@ -111,7 +107,7 @@ export class AppController {
     @Body() data: ConsultaDebitoRequest,
   ): Promise<ConsultaDebitoResponse> {
     try {
-      return await this.baseService.consultaDebitos(data);
+      return await this.debitoService.consultaDebitos(data);
     } catch (error) {
       throw error;
     }
@@ -121,7 +117,7 @@ export class AppController {
    * Consulta débitos associados a um veículo.
    * @param data Dados para consulta de débitos (placa, email, telefone).
    */
-  @ApiOperation({ summary: 'Consultar os débitos de um veículo pela placa' })
+  @ApiOperation({ summary: 'Processa um pagamento de uma lista de débitos' })
   @ApiBody({ type: ProcessaPagamentoRequest })
   @ApiResponse({
     status: 200,
@@ -134,7 +130,7 @@ export class AppController {
     @Body() data: ProcessaPagamentoRequest,
   ): Promise<ProcessaPagamentoResponse> {
     try {
-      return await this.baseService.processaPagamento(data);
+      return await this.pagamentoService.processaPagamento(data);
     } catch (error) {
       throw error;
     }
