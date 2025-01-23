@@ -8,6 +8,8 @@ import { HttpModule } from '@nestjs/axios';
 import { BaseService } from './services/application/base.service';
 import * as process from 'process';
 import { ApiKeyMiddleware } from './middleares/key.middleware';
+import { VeiculoModule } from './modules/application/veiculo/veiculo.module';
+import { ApiModule } from './services/api/api.module';
 
 @Module({
   imports: [
@@ -26,9 +28,11 @@ import { ApiKeyMiddleware } from './middleares/key.middleware';
       timezone: '-03:00',
     }),
     DomainModule,
+    ApiModule,
+    VeiculoModule,
   ],
   controllers: [AppController],
-  providers: [ApiService, BaseService],
+  providers: [BaseService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -20,12 +20,16 @@ import {
   ProcessaPagamentoRequest,
   ProcessaPagamentoResponse,
 } from '../models/application';
+import { VeiculoAppService } from '../modules/application/veiculo/service/veiculo-app.service';
 
 @ApiSecurity('x-api-key')
 @ApiTags('Veicular')
 @Controller('veiculo')
 export class AppController {
-  constructor(private readonly baseService: BaseService) {}
+  constructor(
+    private readonly baseService: BaseService,
+    private readonly veiculoService: VeiculoAppService
+  ) {}
 
   /**
    * Consulta o status de um pedido pelo número.
@@ -81,7 +85,7 @@ export class AppController {
     @Param() params: ConsultaPlacaRequest,
   ): Promise<ConsultaPlacaResponse> {
     try {
-      return await this.baseService.consultarPlaca(
+      return await this.veiculoService.consultarPlaca(
         params.placa,
         params.renavam || null,
       );
