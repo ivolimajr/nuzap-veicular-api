@@ -15,6 +15,9 @@ import { PagamentoAppService } from '../modules/application/pagamento/service/pa
 import { ConsultaPlacaRequest, ConsultaPlacaResponse } from '../modules/application/veiculo/models';
 import { ConsultaDebitoRequest, ConsultaDebitoResponse } from '../modules/application/debito/models';
 import { ProcessaPagamentoRequest, ProcessaPagamentoResponse } from '../modules/application/pagamento/models';
+import { CotacaoDebitoRequest } from '../modules/application/cotacao/models/CotacaoDebitoRequest';
+import { CotacaoDebitoResponse } from '../modules/application/cotacao/models/CotacaoDebitoResponse';
+import { CotacaoAppService } from '../modules/application/cotacao/service/cotacao-app.service';
 
 @ApiSecurity('x-api-key')
 @ApiTags('Veicular')
@@ -24,7 +27,8 @@ export class AppController {
     private readonly veiculoService: VeiculoAppService,
     private readonly pedidoService: PedidoAppService,
     private readonly debitoService: DebitoAppService,
-    private readonly pagamentoService: PagamentoAppService
+    private readonly pagamentoService: PagamentoAppService,
+    private readonly cotacaoAppService: CotacaoAppService
   ) {}
 
   /**
@@ -114,8 +118,8 @@ export class AppController {
   }
 
   /**
-   * Consulta débitos associados a um veículo.
-   * @param data Dados para consulta de débitos (placa, email, telefone).
+   * Processa pagamento de uma consulta.
+   * @param data Dados para pagamento.
    */
   @ApiOperation({ summary: 'Processa um pagamento de uma lista de débitos' })
   @ApiBody({ type: ProcessaPagamentoRequest })
@@ -131,6 +135,30 @@ export class AppController {
   ): Promise<ProcessaPagamentoResponse> {
     try {
       return await this.pagamentoService.processaPagamento(data);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  /**
+   * Realiza a cotação de uma lista de fatura.
+   * @param data Dados para cotação.
+   */
+  @ApiOperation({ summary: 'Cotação de uma lista de faturas' })
+  @ApiBody({ type: CotacaoDebitoRequest })
+  @ApiResponse({
+    status: 200,
+    description: 'Informações do veículo retornadas com sucesso',
+    type: CotacaoDebitoResponse,
+  })
+  @Post('cotacao-debito')
+  @HttpCode(200)
+  async cotacaoDebito(
+    @Body() data: CotacaoDebitoRequest,
+  ): Promise<CotacaoDebitoResponse> {
+    try {
+      return await this.cotacaoAppService.cotacaoDebito(data);
     } catch (error) {
       throw error;
     }

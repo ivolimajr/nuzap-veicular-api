@@ -13,6 +13,7 @@ import { PagamentoAppModule } from './modules/application/pagamento/pagamento-ap
 import { DebitoModule } from './modules/domain/debito/debito.module';
 import { PedidoModule } from './modules/domain/pedido/pedido.module';
 import { VeiculoModule } from './modules/domain/veiculo/veiculo.module';
+import { CotacaoAppModule } from './modules/application/cotacao/cotacao-app.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { VeiculoModule } from './modules/domain/veiculo/veiculo.module';
     DebitoAppModule,
     PedidoAppModule,
     PagamentoAppModule,
+    CotacaoAppModule
   ],
   controllers: [AppController],
   providers: [],

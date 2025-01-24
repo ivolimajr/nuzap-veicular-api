@@ -19,6 +19,8 @@ import {
 } from '../../mock/PNHMock';
 import { CustomException } from '../../middleares/CustomException';
 import { exists } from '../../utils/stringUtils';
+import { PNHCotacaoDebitoRequest } from './models/cotacaoDebito/PNHCotacaoDebitoRequest';
+import { PNHCotacaoDebitoResponse } from './models/cotacaoDebito/PNHCotacaoDebitoResponse';
 
 @Injectable()
 export class PnhApiService {
@@ -180,6 +182,32 @@ export class PnhApiService {
         error.message,
         error.response?.status || 500,
         'Falha ao processar pagamento',
+        error.response?.data,
+      );
+    }
+  }
+
+
+  async cotacaoDebito(
+    data: PNHCotacaoDebitoRequest,
+  ): Promise<PNHCotacaoDebitoResponse> {
+    const token = await this.getToken();
+    const url = `${this.baseUrl}/api/${this.apiVersion}/CotacaoDebito`;
+
+    try {
+      const response: AxiosResponse<PNHCotacaoDebitoResponse> =
+        await lastValueFrom(
+          this.httpService.post(url, data, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        );
+
+      return response.data;
+    } catch (error) {
+      throw new CustomException(
+        error.message,
+        error.response?.status || 500,
+        'Falha ao processar cotação',
         error.response?.data,
       );
     }

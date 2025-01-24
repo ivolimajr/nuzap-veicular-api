@@ -8,10 +8,15 @@ export class ConsultaDebitoResponse {
   @ApiProperty({
     description: 'Mensagem de retorno',
     example: 'Retorno Com Sucesso',
+    type: String,
   })
   mensagem: string;
 
-  @ApiProperty({ description: 'Status da consulta', example: 'Consulta' })
+  @ApiProperty({
+    description: 'Status da consulta',
+    example: 'Consulta',
+    type: String,
+  })
   status: string;
 
   @ApiProperty({
