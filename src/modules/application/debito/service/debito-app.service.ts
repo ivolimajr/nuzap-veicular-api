@@ -204,11 +204,7 @@ export class DebitoAppService {
 
     // Verifica cada requisito
     requisitos.forEach((campo) => {
-      console.info('Veiculo: ');
-      console.info(veiculo);
       const valorVeiculo = veiculo[campo];
-      console.info(campo)
-      console.info(veiculo[campo])
       if (!valorVeiculo) {
         throw new CustomException(
           `Informe o ${campo} para esta UF (${uf})`,
