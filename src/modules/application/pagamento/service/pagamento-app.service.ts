@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PnhApiService } from '../../../integration/pnh-api.service';
 import { PNHProcessaPagamentoRequest } from '../../../integration/models';
-import { getDigits } from '../../../../utils/stringUtils';
+import { getDigits, limparDocumento } from '../../../../utils/stringUtils';
 import { PedidoAppService } from '../../pedido/service/pedido-app.service';
 import { ProcessaPagamentoRequest, ProcessaPagamentoResponse } from '../models';
 
@@ -54,7 +54,7 @@ export class PagamentoAppService {
     request.creditCardNumber = data.creditCardNumber;
     request.monthYear = data.monthYear;
     request.holderName = data.holderName;
-    request.cpfcnpj = getDigits(data.cpfcnpj);
+    request.cpfcnpj = limparDocumento(data.cpfcnpj);
     request.telefone = getDigits(data.telefone);
     return request;
   }

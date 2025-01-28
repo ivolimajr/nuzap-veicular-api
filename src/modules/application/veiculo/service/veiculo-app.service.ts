@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CustomException } from '../../../../middleares/CustomException';
-import { exists, getDigits } from '../../../../utils/stringUtils';
+import { exists, limparDocumento } from '../../../../utils/stringUtils';
 import { PnhApiService } from '../../../integration/pnh-api.service';
 import Veiculo from '../../../domain/veiculo/models/veiculo.model';
 import { PNHConsultaPlacaResponse } from '../../../integration/models';
@@ -10,7 +10,6 @@ import { RequisitosPorUF } from '../../../../utils/const';
 
 @Injectable()
 export class VeiculoAppService {
-
   private readonly requisitosPorUF: Record<string, string[]> = RequisitosPorUF;
 
   constructor(
@@ -46,13 +45,20 @@ export class VeiculoAppService {
     placa = placa.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
     renavam = renavam ? renavam.trim() : null;
     chassi = chassi ? chassi.trim() : null;
-    documento = documento ? getDigits(documento) : null;
+    documento = documento ? limparDocumento(documento) : null;
 
     try {
       const veiculo = await this.veiculoService.buscarPorPlaca(placa);
-
       if (veiculo) {
+        if(!veiculo.renavam && renavam)
+          veiculo.renavam = renavam
+        if(!veiculo.chassi && chassi)
+          veiculo.chassi = chassi
+        if(!veiculo.cpfCnpj && documento)
+          veiculo.cpfCnpj = documento
+
         console.log('Veiculo vindo do banco');
+        await this.veiculoService.atualizar(veiculo);
         return this.mapVeiculoToResponse(veiculo);
       }
 
@@ -79,7 +85,7 @@ export class VeiculoAppService {
   /**
    * Caso não venha nenhum dado da API, retorna que o service não foi encontrado
    */
-  private valididateApiResponse(apiResponse: PNHConsultaPlacaResponse): void{
+  private valididateApiResponse(apiResponse: PNHConsultaPlacaResponse): void {
     if (
       !apiResponse.resposta ||
       exists(apiResponse.solicitacao?.mensagem, 'Erro')
@@ -130,7 +136,7 @@ export class VeiculoAppService {
       anoModelo: veiculo.anoModelo,
       uf: veiculo.uf,
       cpfCnpj: veiculo.cpfCnpj,
-      pendentes: this.verificarPendencias(veiculo)
+      pendentes: this.verificarPendencias(veiculo),
     };
   }
 
@@ -140,7 +146,7 @@ export class VeiculoAppService {
 
     requisitos.forEach((campo) => {
       const valor = veiculo[campo];
-      if (!valor || valor.trim() === "") {
+      if (!valor || valor.trim() === '') {
         pendentes.push(campo);
       }
     });

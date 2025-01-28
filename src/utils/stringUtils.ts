@@ -11,6 +11,19 @@ export function getDigits(input: string): string {
   return input.replace(/\D/g, ""); // Remove todos os caracteres que não são números
 }
 
+/**
+ * Limpa todos os caracteres especiais de um cpf ou cnpj
+ * @type string
+ * @return String
+ * @example "037.464.571-06" > "03746457106"
+ * @example '0000@00!12>3' -> '000000123
+ * @param documento
+ */
+export function limparDocumento(documento: string): string {
+  return documento.replace(/\D/g, '');
+}
+
+
 
 /**
  * Verifica se um valor está contido dentro de uma string completa.

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PnhApiService } from '../../../integration/pnh-api.service';
-import { getDigits } from '../../../../utils/stringUtils';
+import { getDigits, limparDocumento } from '../../../../utils/stringUtils';
 import * as moment from 'moment/moment';
 import {
   PNHConsultaDebitoRequest,
@@ -42,7 +42,7 @@ export class DebitoAppService {
       .toLowerCase();
     data.renavam = data.renavam ? data.renavam.trim() : null;
     data.chassi = data.chassi ? data.chassi.trim() : null;
-    data.cpfCnpj = data.cpfCnpj ? getDigits(data.cpfCnpj) : null;
+    data.cpfCnpj = data.cpfCnpj ? limparDocumento(data.cpfCnpj) : null;
 
     const veiculo = await this.veiculoAppService.consultarPlaca(
       data.placa,
