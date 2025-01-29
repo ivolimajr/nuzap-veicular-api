@@ -110,15 +110,21 @@ export class PnhApiService {
     } catch (error) {
       let userMessage = 'Falha na consulta de débitos';
       if (error.response.data) {
-        if (
-          error.response.data.message &&
-          exists(error.response.data.message, 'Detran está indisponível')
-        ) {
-          userMessage =
-            'O sistema do Detran está indisponível, tente novamente mais tarde !';
+        if (error.response.data.message) {
+          if (exists(error.response.data.message, 'Detran está indisponível')) {
+            userMessage =
+              'O sistema do Detran está indisponível, tente novamente mais tarde !';
 
-          error.message =
-            'O sistema do Detran está indisponível, tente novamente mais tarde !';
+            error.message =
+              'O sistema do Detran está indisponível, tente novamente mais tarde !';
+          }
+          if (exists(error.response.data.message, 'Não foram localizados débitos')) {
+            userMessage =
+              'Não foram localizados débitos para o veículo informado !';
+
+            error.message =
+              'Não foram localizados débitos para o veículo informado !';
+          }
         }
       }
       throw new CustomException(
