@@ -7,8 +7,8 @@
  * @example '000000123' -> '123
  */
 export function getDigits(input: string): string {
-  if (!input || typeof input !== "string") return input;
-  return input.replace(/\D/g, ""); // Remove todos os caracteres que não são números
+  if (!input || typeof input !== 'string') return input;
+  return input.replace(/\D/g, ''); // Remove todos os caracteres que não são números
 }
 
 /**
@@ -23,8 +23,6 @@ export function limparDocumento(documento: string): string {
   return documento.replace(/\D/g, '');
 }
 
-
-
 /**
  * Verifica se um valor está contido dentro de uma string completa.
  * @param value texto completo
@@ -35,6 +33,22 @@ export function limparDocumento(documento: string): string {
  * @example "Pagamento não processado" | "Processado" = true
  */
 export function exists(value: string, find: string): boolean {
-  const regex = new RegExp(find, "i"); // Ignora camel case
+  const regex = new RegExp(find, 'i'); // Ignora camel case
   return regex.test(value);
+}
+/**
+ * Verifica se um renavam é valido.
+ * @type string
+ * @type string
+ * @return Boolean
+ * @example "Pagamento não processado" | "Processado" = true
+ * @param renavam
+ */
+export function renavamIsValid(renavam): boolean {
+  if (!renavam) return false;
+  renavam = renavam.trim();
+  if (renavam.length <= 8) return false;
+  //Verifica se há letras ou caracteres especiais na string
+  const regex: RegExp = /^\d+$/;
+  return regex.test(renavam);
 }

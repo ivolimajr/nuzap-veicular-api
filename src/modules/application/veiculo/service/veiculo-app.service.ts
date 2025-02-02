@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CustomException } from '../../../../middleares/CustomException';
-import { exists, limparDocumento } from '../../../../utils/stringUtils';
+import {
+  exists,
+  limparDocumento,
+  renavamIsValid,
+} from '../../../../utils/stringUtils';
 import { PnhApiService } from '../../../integration/pnh-api.service';
 import Veiculo from '../../../domain/veiculo/models/veiculo.model';
 import { PNHConsultaPlacaResponse } from '../../../integration/models';
@@ -47,15 +51,20 @@ export class VeiculoAppService {
     chassi = chassi ? chassi.trim() : null;
     documento = documento ? limparDocumento(documento) : null;
 
+    if (renavam && !renavamIsValid(renavam))
+      throw new CustomException(
+        'Renavam inválido',
+        404,
+        'Verifique o renavam informado',
+        renavam,
+      );
+
     try {
       const veiculo = await this.veiculoService.buscarPorPlaca(placa);
       if (veiculo) {
-        if(!veiculo.renavam && renavam)
-          veiculo.renavam = renavam
-        if(!veiculo.chassi && chassi)
-          veiculo.chassi = chassi
-        if(!veiculo.cpfCnpj && documento)
-          veiculo.cpfCnpj = documento
+        if (!veiculo.renavam && renavam) veiculo.renavam = renavam;
+        if (!veiculo.chassi && chassi) veiculo.chassi = chassi;
+        if (!veiculo.cpfCnpj && documento) veiculo.cpfCnpj = documento;
 
         console.log('Veiculo vindo do banco');
         await this.veiculoService.atualizar(veiculo);
